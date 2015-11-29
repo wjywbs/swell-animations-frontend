@@ -1,0 +1,5 @@
+*.sln
+*.csproj
+PathfinderPrototype/PathfinderPrototype.v12.suo
+PathfinderPrototype/Library/
+PathfinderPrototype/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
