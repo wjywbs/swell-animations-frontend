@@ -16,7 +16,7 @@ public class GridEditor : Editor
     Texture2D pencilIcon;
 
     bool blockingMouseInput = false;
-    bool drawing = false;
+    static bool drawing = false;
 
     public void OnEnable()
     {
@@ -43,7 +43,7 @@ public class GridEditor : Editor
 
         GUIContent editButtonContent = new GUIContent();
         editButtonContent.image = pencilIcon;
-        editButtonContent.text = "Edit LOA";
+        editButtonContent.text = "Clear LOA";
 
         GUILayout.BeginVertical();
         GUILayout.Label(" Animation Preview Control ");
@@ -59,12 +59,14 @@ public class GridEditor : Editor
         GUILayout.EndHorizontal();
         if(GUILayout.Button(drawButtonContent, GUILayout.Height(BUTTON_HEIGHT)))
         {
-            drawing = true;           
-            Cursor.SetCursor(pencilIcon, Vector2.zero, CursorMode.Auto);
+            Debug.Log("Draw LOA Clicked");
+            drawing = true;
+            Debug.Log("Drawing: " + drawing);
         }
         if (GUILayout.Button(editButtonContent, GUILayout.Height(BUTTON_HEIGHT)))
         {
             grid.clearPoints();
+            SceneView.RepaintAll();
         }
         GUILayout.BeginHorizontal();
         GUILayout.Label("Mesh");
@@ -83,7 +85,10 @@ public class GridEditor : Editor
     private void OnSceneGUI()
     {
         Event e = Event.current;
-
+        if (drawing)
+        {
+            Debug.Log("Drawing: " + drawing);
+        }
         if (e.type == EventType.MouseDown && drawing)
         {
             Debug.Log("Mouse Down");
@@ -102,6 +107,7 @@ public class GridEditor : Editor
                 Debug.Log("World Position: " + worldPos);
                 worldPos.y = worldPos.y * -1;
                 grid.addPoint(worldPos);
+                SceneView.RepaintAll();
             }
         }
         else if (e.type == EventType.MouseUp)
@@ -110,12 +116,11 @@ public class GridEditor : Editor
             if (blockingMouseInput)
             {
                 e.Use();
-                drawing = false;
-                Cursor.SetCursor(pencilIcon, Vector2.zero, CursorMode.Auto);               
+                drawing = false;             
             }
             blockingMouseInput = false;
         }
-        else if (e.type == EventType.Layout && drawing)
+        if (e.type == EventType.Layout && drawing)
         {
             //somehow this allows e.Use() to actually function and block mouse input
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
