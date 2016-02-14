@@ -14,9 +14,12 @@ public class GridEditor : Editor
     Texture2D ffIcon;
     Texture2D endIcon;
     Texture2D pencilIcon;
+    Texture2D rotationIcon;
+    Texture2D eyeIcon;
 
     bool blockingMouseInput = false;
     static bool drawing = false;
+    private Vector2 lastPoint;
 
     public void OnEnable()
     {
@@ -27,6 +30,8 @@ public class GridEditor : Editor
         ffIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/FF.png", typeof(Texture2D));
         endIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/end.png", typeof(Texture2D));
         pencilIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil.png", typeof(Texture2D));
+        rotationIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rotation.png", typeof(Texture2D));
+        eyeIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eye_open.png", typeof(Texture2D));
     }
 
     public override void OnInspectorGUI()
@@ -39,11 +44,23 @@ public class GridEditor : Editor
 
         GUIContent drawButtonContent = new GUIContent();
         drawButtonContent.image = pencilIcon;
-        drawButtonContent.text = "Draw LOA";
+        drawButtonContent.text = "Edit LOA";
 
         GUIContent editButtonContent = new GUIContent();
         editButtonContent.image = pencilIcon;
         editButtonContent.text = "Clear LOA";
+
+        GUIContent rotationButtonContent = new GUIContent();
+        rotationButtonContent.image = rotationIcon;
+        rotationButtonContent.text = "Add Rotation Point"; 
+        
+        GUIContent hideLOAButtonContent = new GUIContent();
+        hideLOAButtonContent.image = eyeIcon;
+        hideLOAButtonContent.text = "Hide LOA";
+
+        GUIContent hideRotationButtonContent = new GUIContent();
+        hideRotationButtonContent.image = eyeIcon;
+        hideRotationButtonContent.text = "Hide Rotation Points";
 
         GUILayout.BeginVertical();
         GUILayout.Label(" Animation Preview Control ");
@@ -59,60 +76,48 @@ public class GridEditor : Editor
         GUILayout.EndHorizontal();
         if(GUILayout.Button(drawButtonContent, GUILayout.Height(BUTTON_HEIGHT)))
         {
-            Debug.Log("Draw LOA Clicked");
             drawing = true;
-            Debug.Log("Drawing: " + drawing);
         }
         if (GUILayout.Button(editButtonContent, GUILayout.Height(BUTTON_HEIGHT)))
         {
             grid.clearPoints();
             SceneView.RepaintAll();
         }
+        GUILayout.Button(rotationButtonContent, GUILayout.Height(BUTTON_HEIGHT));
+        GUILayout.Button(hideLOAButtonContent, GUILayout.Height(BUTTON_HEIGHT));
+        GUILayout.Button(hideRotationButtonContent, GUILayout.Height(BUTTON_HEIGHT));
         GUILayout.BeginHorizontal();
         GUILayout.Label("Mesh");
-        GUILayout.TextField("mesh name");
+        GUILayout.TextField("mesh name");     
         GUILayout.EndHorizontal();
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Animation Layers");
-        GUILayout.FlexibleSpace();
-        GUILayout.Button("+");
-        GUILayout.Button("-");
-        GUILayout.EndHorizontal();
-        GUILayout.TextArea("", GUILayout.Height(300));
+
+        GUILayout.Label("Editor Plane");
+
+        grid.planePoint1 = EditorGUILayout.ObjectField("Plane Point 1", grid.planePoint1, typeof(Transform), true) as Transform;
+        grid.planePoint2 = EditorGUILayout.ObjectField("Plane Point 2", grid.planePoint2, typeof(Transform), true) as Transform;
+        grid.planePoint3 = EditorGUILayout.ObjectField("Plane Point 3", grid.planePoint3, typeof(Transform), true) as Transform;
+
         GUILayout.EndVertical();
     }
 
     private void OnSceneGUI()
     {
         Event e = Event.current;
-        if (drawing)
-        {
-            Debug.Log("Drawing: " + drawing);
-        }
         if (e.type == EventType.MouseDown && drawing)
         {
-            Debug.Log("Mouse Down");
             blockingMouseInput = true;
 
         }
-        else if (e.type == EventType.MouseDrag)
+        else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
-            Debug.Log("Dragging");
             if(drawing)
             {
-                Vector3 point = e.mousePosition;
-                Debug.Log("Mouse Point: " + point);
-                point.z = SceneView.currentDrawingSceneView.camera.transform.position.z;
-                Vector3 worldPos = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(point);
-                Debug.Log("World Position: " + worldPos);
-                worldPos.y = worldPos.y * -1;
-                grid.addPoint(worldPos);
+                getWorldPointFromMousePoint(e.mousePosition);
                 SceneView.RepaintAll();
             }
         }
         else if (e.type == EventType.MouseUp)
         {
-            Debug.Log("Mouse Up");
             if (blockingMouseInput)
             {
                 e.Use();
@@ -126,4 +131,20 @@ public class GridEditor : Editor
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
     }
+
+    private void getWorldPointFromMousePoint(Vector3 mousePoint)
+    {
+        Camera camera = SceneView.currentDrawingSceneView.camera;
+        mousePoint.y = -mousePoint.y + camera.pixelHeight;
+        Ray ray = camera.ScreenPointToRay(mousePoint);
+        Debug.Log(ray);
+        float rayDistance;
+        if (grid.editorPlane.Raycast(ray, out rayDistance))
+        {
+            Vector3 point = ray.GetPoint(rayDistance);            
+            grid.addPoint(point);
+        }        
+    }
+
+
 }
