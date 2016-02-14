@@ -40,7 +40,13 @@ public class GridEditor : Editor
 				buttonStyle.margin = new RectOffset (5, 5, 5, 5);
 				buttonStyle.padding = new RectOffset (2, 2, 2, 2);
 				buttonStyle.fixedHeight = BUTTON_HEIGHT;
-				buttonStyle.fixedWidth = 64;
+				buttonStyle.fixedWidth = 32;
+
+				GUIStyle middleButtonStyle = new GUIStyle (GUI.skin.button);
+				middleButtonStyle.margin = new RectOffset (5, 5, 5, 5);
+				middleButtonStyle.padding = new RectOffset (2, 2, 2, 2);
+				middleButtonStyle.fixedHeight = BUTTON_HEIGHT;
+				middleButtonStyle.fixedWidth = 200;
 
 				GUIContent drawButtonContent = new GUIContent ();
 				drawButtonContent.image = pencilIcon;
@@ -74,16 +80,36 @@ public class GridEditor : Editor
 				GUILayout.Button (endIcon, buttonStyle);
 				GUILayout.FlexibleSpace ();
 				GUILayout.EndHorizontal ();
-				if (GUILayout.Button (drawButtonContent, GUILayout.Height (BUTTON_HEIGHT))) {
+				GUILayout.BeginHorizontal ();
+				GUILayout.FlexibleSpace ();
+				if (GUILayout.Button (drawButtonContent, middleButtonStyle)) {
 						drawing = true;
 				}
-				if (GUILayout.Button (editButtonContent, GUILayout.Height (BUTTON_HEIGHT))) {
+				GUILayout.FlexibleSpace ();
+				GUILayout.EndHorizontal ();
+				GUILayout.BeginHorizontal ();
+				GUILayout.FlexibleSpace ();
+				if (GUILayout.Button (editButtonContent, middleButtonStyle)) {
 						grid.clearPoints ();
 						SceneView.RepaintAll ();
 				}
-				GUILayout.Button (rotationButtonContent, GUILayout.Height (BUTTON_HEIGHT));
-				GUILayout.Button (hideLOAButtonContent, GUILayout.Height (BUTTON_HEIGHT));
-				GUILayout.Button (hideRotationButtonContent, GUILayout.Height (BUTTON_HEIGHT));
+				GUILayout.FlexibleSpace ();
+				GUILayout.EndHorizontal ();
+				GUILayout.BeginHorizontal ();
+				GUILayout.FlexibleSpace ();
+				GUILayout.Button (rotationButtonContent, middleButtonStyle);
+				GUILayout.FlexibleSpace ();
+				GUILayout.EndHorizontal ();
+				GUILayout.BeginHorizontal ();
+				GUILayout.FlexibleSpace ();
+				GUILayout.Button (hideLOAButtonContent, middleButtonStyle);
+				GUILayout.FlexibleSpace ();
+				GUILayout.EndHorizontal ();
+				GUILayout.BeginHorizontal ();
+				GUILayout.FlexibleSpace ();
+				GUILayout.Button (hideRotationButtonContent, middleButtonStyle);
+				GUILayout.FlexibleSpace ();
+				GUILayout.EndHorizontal ();
 				GUILayout.BeginHorizontal ();
 				GUILayout.Label ("Mesh");
 				GUILayout.TextField ("mesh name");     
