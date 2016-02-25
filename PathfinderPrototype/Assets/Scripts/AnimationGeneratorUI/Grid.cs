@@ -14,9 +14,9 @@ public class Grid : MonoBehaviour
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
 
-    private Vector3 planeOrigin = new Vector3();
-    private Vector3 planeVector1 = new Vector3();
-    private Vector3 planeVector2 = new Vector3();
+    public Vector3 planeOrigin = new Vector3();
+    public Vector3 planeVector1 = new Vector3();
+    public Vector3 planeVector2 = new Vector3();
 
     [SerializeField]
     public Transform planePoint1;
