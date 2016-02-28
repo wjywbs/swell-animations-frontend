@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using swellanimations;
 
 [AddComponentMenu("Animation/Animation Generator")]
 [System.Serializable]
-public class Grid : MonoBehaviour
+public class AnimationGenerator : MonoBehaviour
 {
     public int widthLines = 100;
     public int heightLines = 100;
     public float cellWidth = 32.0f;
     public float cellHeight = 32.0f;
+
+    [SerializeField]
+    public GameObject model;
 
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
@@ -82,5 +86,34 @@ public class Grid : MonoBehaviour
         planeVector1 = vectorA.normalized;
         planeVector2 = perpVectorA.normalized;
         editorPlane = new Plane(planePoint1.position, planePoint2.position, planePoint3.position);
+    }
+
+    public Node GenerateNode()
+    {
+        Node node = new Node()
+        {
+            name = model.name,
+            positionX = model.transform.position.x,
+            positionY = model.transform.position.y,
+            positionZ = model.transform.position.z,
+            rotationX = model.transform.rotation.eulerAngles.x,
+            rotationY = model.transform.rotation.eulerAngles.y,
+            rotationZ = model.transform.rotation.eulerAngles.z
+        };
+        node.rotationX = 0;
+        model.name.Contains("spine");
+        model.GetComponentsInChildren<GameObject>();
+        return node;
+    }
+
+    public void AnimateFrame()
+    {
+        Node[] nodes = new Node[50];
+        //Coroutine
+    }
+
+    public void PlayAnimation()
+    {
+        Debug.Log("Play Animation: Points: " + points.Count);
     }
 }

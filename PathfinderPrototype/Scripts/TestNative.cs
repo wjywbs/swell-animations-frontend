@@ -10,6 +10,7 @@ using System;
 public class TestNative : MonoBehaviour {
 
     [DllImport("TestDLL")]
+
     private static extern IntPtr setDataNegative(byte[] a, int size, ref uint outputSize);
 
 	void Start () {

@@ -2,12 +2,12 @@
 using UnityEditor;
 using System.Collections;
 
-[CustomEditor(typeof(Grid))]
-public class GridEditor : Editor
+[CustomEditor(typeof(AnimationGenerator))]
+public class AnimationGeneratorEditor : Editor
 {
     static int BUTTON_HEIGHT = 24;
 
-    Grid grid;
+    AnimationGenerator generator;
     Texture2D beginIcon;
     Texture2D rewIcon;
     Texture2D playIcon;
@@ -23,7 +23,7 @@ public class GridEditor : Editor
 
     public void OnEnable()
     {
-        grid = (Grid)target;
+        generator = (AnimationGenerator)target;
         beginIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/begining.png", typeof(Texture2D));
         rewIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rew.png", typeof(Texture2D));
         playIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/play.png", typeof(Texture2D));
@@ -75,7 +75,10 @@ public class GridEditor : Editor
         GUILayout.FlexibleSpace();
         GUILayout.Button(beginIcon, buttonStyle);
         GUILayout.Button(rewIcon, buttonStyle);
-        GUILayout.Button(playIcon, buttonStyle);
+        if(GUILayout.Button(playIcon, buttonStyle))
+        {
+            generator.PlayAnimation();
+        }
         GUILayout.Button(ffIcon, buttonStyle);
         GUILayout.Button(endIcon, buttonStyle);
         GUILayout.FlexibleSpace();
@@ -92,7 +95,7 @@ public class GridEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(editButtonContent, middleButtonStyle))
         {
-            grid.clearPoints();
+            generator.clearPoints();
             SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();
@@ -102,8 +105,8 @@ public class GridEditor : Editor
         if (GUILayout.Button("Center On Drawing Plane", middleButtonStyle))
         {
             SceneView scenView = SceneView.lastActiveSceneView;
-            Quaternion rotation = Quaternion.LookRotation(grid.editorPlane.normal, grid.planeVector1 * -1);
-            scenView.LookAt(grid.planePoint1.position, rotation);
+            Quaternion rotation = Quaternion.LookRotation(generator.editorPlane.normal, generator.planeVector1 * -1);
+            scenView.LookAt(generator.planePoint1.position, rotation);
             scenView.Repaint();
         }
         GUILayout.FlexibleSpace();
@@ -124,15 +127,14 @@ public class GridEditor : Editor
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Mesh");
-        GUILayout.TextField("mesh name");
+        generator.model = EditorGUILayout.ObjectField("Model", generator.model, typeof(GameObject), true) as GameObject;
         GUILayout.EndHorizontal();
 
         GUILayout.Label("Editor Plane");
 
-        grid.planePoint1 = EditorGUILayout.ObjectField("Plane Point 1", grid.planePoint1, typeof(Transform), true) as Transform;
-        grid.planePoint2 = EditorGUILayout.ObjectField("Plane Point 2", grid.planePoint2, typeof(Transform), true) as Transform;
-        grid.planePoint3 = EditorGUILayout.ObjectField("Plane Point 3", grid.planePoint3, typeof(Transform), true) as Transform;
+        generator.planePoint1 = EditorGUILayout.ObjectField("Plane Point 1", generator.planePoint1, typeof(Transform), true) as Transform;
+        generator.planePoint2 = EditorGUILayout.ObjectField("Plane Point 2", generator.planePoint2, typeof(Transform), true) as Transform;
+        generator.planePoint3 = EditorGUILayout.ObjectField("Plane Point 3", generator.planePoint3, typeof(Transform), true) as Transform;
 
         GUILayout.EndVertical();
     }
@@ -174,10 +176,10 @@ public class GridEditor : Editor
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(mousePoint);
         float rayDistance;
-        if (grid.editorPlane.Raycast(ray, out rayDistance))
+        if (generator.editorPlane.Raycast(ray, out rayDistance))
         {
             Vector3 point = ray.GetPoint(rayDistance);
-            grid.addPoint(point);
+            generator.addPoint(point);
         }
     }
 
