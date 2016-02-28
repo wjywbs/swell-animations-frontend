@@ -96,6 +96,7 @@ GameObject:
   - 33: {fileID: 93768373}
   - 65: {fileID: 93768372}
   - 23: {fileID: 93768371}
+  - 114: {fileID: 93768375}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -160,6 +161,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+--- !u!114 &93768375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 93768370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b0e3fa8d0fe0d54bb9ede8a37a99cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &232655675
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,6 +300,9 @@ MonoBehaviour:
   cellWidth: 32
   cellHeight: 32
   points: []
+  planeOrigin: {x: -9657.87, y: -39.7097, z: 204.43832}
+  planeVector1: {x: 0.30747202, y: -0.9315564, z: -0.19407123}
+  planeVector2: {x: -0.8150341, y: -0.36308226, z: 0.45154262}
   planePoint1: {fileID: 650228723}
   planePoint2: {fileID: 613350777}
   planePoint3: {fileID: 1994321683}
