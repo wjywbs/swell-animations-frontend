@@ -30,6 +30,9 @@ public class AnimationGenerator : MonoBehaviour
     public Transform planePoint3;
     public Plane editorPlane;
 
+    private int currentFrame = 0;
+    private float timeBetweenFrames = 0.1f;
+
     void OnDrawGizmos()
     {
         DrawGrid();
@@ -106,10 +109,19 @@ public class AnimationGenerator : MonoBehaviour
         return node;
     }
 
-    public void AnimateFrame()
+    public IEnumerator AnimateFrame()
     {
         Node[] nodes = new Node[50];
-        //Coroutine
+        if(currentFrame < nodes.Length)
+        {
+            //code for setting the positions and rotations
+            currentFrame++;
+            yield return new WaitForSeconds(timeBetweenFrames);
+        }
+        else
+        {
+            yield break;
+        }
     }
 
     public void PlayAnimation()
