@@ -94,7 +94,7 @@ public class AnimationGenerator : MonoBehaviour
     public Node GenerateNode()
     {
         Node node = CreateNodeFromGameObject(model);
-        GenerateChildren(transform, node);
+        GenerateChildren(model, node);
         return node;
     }
 
