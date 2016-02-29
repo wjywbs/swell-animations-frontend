@@ -103,29 +103,31 @@ public class AnimationGenerator : MonoBehaviour
             rotationY = model.transform.rotation.eulerAngles.y,
             rotationZ = model.transform.rotation.eulerAngles.z
         };
+        node.children.Add(new Node());
         node.rotationX = 0;
         model.name.Contains("spine");
         model.GetComponentsInChildren<GameObject>();
         return node;
     }
 
-    public IEnumerator AnimateFrame()
+    public IEnumerator AnimateFrame(Node[] nodes)
     {
-        Node[] nodes = new Node[50];
-        if(currentFrame < nodes.Length)
+        while(currentFrame < nodes.Length)
         {
+            Node currentNode = nodes[currentFrame];
             //code for setting the positions and rotations
+            Debug.Log("");
             currentFrame++;
             yield return new WaitForSeconds(timeBetweenFrames);
         }
-        else
-        {
-            yield break;
-        }
+        yield break;        
     }
 
     public void PlayAnimation()
     {
         Debug.Log("Play Animation: Points: " + points.Count);
+        Node[] nodes = new Node[50];
+        //Create dummy test data inside of nodes
+        StartCoroutine(AnimateFrame(nodes));
     }
 }
