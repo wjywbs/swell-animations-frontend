@@ -127,7 +127,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        generator.model = EditorGUILayout.ObjectField("Model", generator.model, typeof(GameObject), true) as GameObject;
+        generator.model = EditorGUILayout.ObjectField("Model", generator.model, typeof(Transform), true) as Transform;
         GUILayout.EndHorizontal();
 
         GUILayout.Label("Editor Plane");

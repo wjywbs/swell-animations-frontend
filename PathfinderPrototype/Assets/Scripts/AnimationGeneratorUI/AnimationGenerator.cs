@@ -13,7 +13,7 @@ public class AnimationGenerator : MonoBehaviour
     public float cellHeight = 32.0f;
 
     [SerializeField]
-    public GameObject model;
+    public Transform model;
 
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
@@ -93,21 +93,34 @@ public class AnimationGenerator : MonoBehaviour
 
     public Node GenerateNode()
     {
-        Node node = new Node()
-        {
-            name = model.name,
-            positionX = model.transform.position.x,
-            positionY = model.transform.position.y,
-            positionZ = model.transform.position.z,
-            rotationX = model.transform.rotation.eulerAngles.x,
-            rotationY = model.transform.rotation.eulerAngles.y,
-            rotationZ = model.transform.rotation.eulerAngles.z
-        };
-        node.children.Add(new Node());
-        node.rotationX = 0;
-        model.name.Contains("spine");
-        model.GetComponentsInChildren<GameObject>();
+        Node node = CreateNodeFromGameObject(model);
+        GenerateChildren(transform, node);
         return node;
+    }
+
+    private Node CreateNodeFromGameObject(Transform transform)
+    {
+        return new Node()
+        {
+            name = transform.gameObject.name,
+            positionX = transform.position.x,
+            positionY = transform.position.y,
+            positionZ = transform.position.z,
+            rotationX = transform.rotation.eulerAngles.x,
+            rotationY = transform.rotation.eulerAngles.y,
+            rotationZ = transform.rotation.eulerAngles.z
+        };
+    }
+
+    private void GenerateChildren(Transform children, Node parent)
+    {
+        foreach (Transform transform in children)
+        {
+            Node child = CreateNodeFromGameObject(transform);
+            child.parent = parent;
+            parent.children.Add(child);
+            GenerateChildren(transform, child);
+        }
     }
 
     public IEnumerator AnimateFrame(Node[] nodes)
@@ -116,7 +129,7 @@ public class AnimationGenerator : MonoBehaviour
         {
             Node currentNode = nodes[currentFrame];
             //code for setting the positions and rotations
-            Debug.Log("");
+            Debug.Log(currentFrame);
             currentFrame++;
             yield return new WaitForSeconds(timeBetweenFrames);
         }
@@ -126,8 +139,30 @@ public class AnimationGenerator : MonoBehaviour
     public void PlayAnimation()
     {
         Debug.Log("Play Animation: Points: " + points.Count);
-        Node[] nodes = new Node[50];
-        //Create dummy test data inside of nodes
-        StartCoroutine(AnimateFrame(nodes));
+        Node node = GenerateNode();
+        PrintAllNodes(node, "|");
+    }
+
+
+    //The following are used for debug purposes
+    private void PrintAllNodes(Node node, string spacing)
+    {
+        Debug.Log(spacing + PrintNode(node)); ;
+        foreach (Node childNode in node.children)
+        {
+            PrintAllNodes(childNode, spacing + "-");
+        }
+
+    }
+
+    private string PrintNode(Node node)
+    {
+        return "Name: " + node.name +
+        " positionX: " + node.positionX +
+        " positionY: " + node.positionY +
+        " positionX: " + node.positionZ +
+        " rotationX: " + node.rotationX +
+        " rotationY: " + node.rotationY +
+        " rotationZ: " + node.rotationZ;
     }
 }
