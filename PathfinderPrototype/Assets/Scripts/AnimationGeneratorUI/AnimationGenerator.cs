@@ -30,8 +30,18 @@ public class AnimationGenerator : MonoBehaviour
     public Transform planePoint3;
     public Plane editorPlane;
 
+    [SerializeField]
+    private Node[] nodes;
+
     private int currentFrame = 0;
-    private float timeBetweenFrames = 0.1f;
+    public float timeBetweenFrames = 0.1f;
+
+    private bool animationPlaying = false;
+    private float m_LastEditorUpdateTime;
+
+    private Vector3 beginPostion;
+    private Quaternion beginRotation;
+    private bool drawPlane = true;
 
     void OnDrawGizmos()
     {
@@ -46,25 +56,29 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
+
     void DrawGrid()
     {
-        calculatePlaneVectors();
-        Vector3 lineStartBase = (planeVector1 * heightLines / 2);
-        Gizmos.color = Color.grey;
-        for (int x = -widthLines / 2; x < widthLines / 2; x++)
+        if (drawPlane)
         {
-            Vector3 lineIncrementBase = ((planeVector2 * x) + planeOrigin);
-            Vector3 lineStart = lineIncrementBase + lineStartBase;
-            Vector3 LineEnd = lineIncrementBase - lineStartBase;
-            Gizmos.DrawLine(lineStart, LineEnd);
-        }
-        lineStartBase = (planeVector2 * widthLines / 2);
-        for (int y = -heightLines / 2; y < heightLines / 2; y++)
-        {
-            Vector3 lineIncrementBase = ((planeVector1 * y) + planeOrigin);
-            Vector3 lineStart = lineIncrementBase + lineStartBase;
-            Vector3 LineEnd = lineIncrementBase - lineStartBase;
-            Gizmos.DrawLine(lineStart, LineEnd);
+            calculatePlaneVectors();
+            Vector3 lineStartBase = (planeVector1 * heightLines / 2);
+            Gizmos.color = Color.grey;
+            for (int x = -widthLines / 2; x < widthLines / 2; x++)
+            {
+                Vector3 lineIncrementBase = ((planeVector2 * x) + planeOrigin);
+                Vector3 lineStart = lineIncrementBase + lineStartBase;
+                Vector3 LineEnd = lineIncrementBase - lineStartBase;
+                Gizmos.DrawLine(lineStart, LineEnd);
+            }
+            lineStartBase = (planeVector2 * widthLines / 2);
+            for (int y = -heightLines / 2; y < heightLines / 2; y++)
+            {
+                Vector3 lineIncrementBase = ((planeVector1 * y) + planeOrigin);
+                Vector3 lineStart = lineIncrementBase + lineStartBase;
+                Vector3 LineEnd = lineIncrementBase - lineStartBase;
+                Gizmos.DrawLine(lineStart, LineEnd);
+            }
         }
     }
 
@@ -91,78 +105,52 @@ public class AnimationGenerator : MonoBehaviour
         editorPlane = new Plane(planePoint1.position, planePoint2.position, planePoint3.position);
     }
 
-    public Node GenerateNode()
+    public void ToggleAnimation()
     {
-        Node node = CreateNodeFromGameObject(model);
-        GenerateChildren(model, node);
-        return node;
-    }
-
-    private Node CreateNodeFromGameObject(Transform transform)
-    {
-        return new Node()
+        animationPlaying = !animationPlaying;
+        if (animationPlaying)
         {
-            name = transform.gameObject.name,
-            positionX = transform.position.x,
-            positionY = transform.position.y,
-            positionZ = transform.position.z,
-            rotationX = transform.rotation.eulerAngles.x,
-            rotationY = transform.rotation.eulerAngles.y,
-            rotationZ = transform.rotation.eulerAngles.z
-        };
-    }
-
-    private void GenerateChildren(Transform children, Node parent)
-    {
-        foreach (Transform transform in children)
+            currentFrame = 0;
+            beginPostion = model.position;
+            beginRotation = model.rotation;
+            drawPlane = false;
+        }
+        else
         {
-            Node child = CreateNodeFromGameObject(transform);
-            child.parent = parent;
-            parent.children.Add(child);
-            GenerateChildren(transform, child);
+            model.position = beginPostion;
+            model.rotation = beginRotation;
+            drawPlane = true;
         }
     }
 
-    public IEnumerator AnimateFrame(Node[] nodes)
+    public void UpdateAnimation(float deltaTime)
     {
-        while(currentFrame < nodes.Length)
+        if(animationPlaying && deltaTime >= timeBetweenFrames)
         {
-            Node currentNode = nodes[currentFrame];
-            //code for setting the positions and rotations
-            Debug.Log(currentFrame);
-            currentFrame++;
-            yield return new WaitForSeconds(timeBetweenFrames);
+            if (currentFrame < points.Count)
+            {
+                AnimateFrame(currentFrame);
+                currentFrame++;
+            }
+            else
+            {
+                ToggleAnimation();
+            }
         }
-        yield break;        
     }
 
-    public void PlayAnimation()
+    public void AnimateFrame(int frame)
     {
-        Debug.Log("Play Animation: Points: " + points.Count);
-        Node node = GenerateNode();
-        PrintAllNodes(node, "|");
-    }
+        //You wold want to use the frame number to get the correct fraome
+        //ex: Node node = frames[frame];
 
-
-    //The following are used for debug purposes
-    private void PrintAllNodes(Node node, string spacing)
-    {
-        Debug.Log(spacing + PrintNode(node)); ;
-        foreach (Node childNode in node.children)
+        //This code I have here just moves the model to each point on the line, obviously not what we want in the final version
+        model.position = points[currentFrame];
+        if (currentFrame + 1 < points.Count)
         {
-            PrintAllNodes(childNode, spacing + "-");
+            model.rotation = Quaternion.LookRotation((points[currentFrame + 1] - model.position).normalized);
         }
 
     }
 
-    private string PrintNode(Node node)
-    {
-        return "Name: " + node.name +
-        " positionX: " + node.positionX +
-        " positionY: " + node.positionY +
-        " positionX: " + node.positionZ +
-        " rotationX: " + node.rotationX +
-        " rotationY: " + node.rotationY +
-        " rotationZ: " + node.rotationZ;
-    }
 }

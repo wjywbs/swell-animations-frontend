@@ -13,21 +13,33 @@ public class TestNative : MonoBehaviour {
     private static extern IntPtr setDataNegative(byte[] a, int size, ref uint outputSize);
 
 	void Start () {
-       // print("Message from libhello: " + hello());
         Debug.Log("Hello");
         Node node = new Node()
         {
-           // data = 0
+            name = "s" + 0,
+            positionX = 0,
+            positionY = 0,
+            positionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0
         };
-        for(int x = 1; x < 100; x++)
-        {
-            Node newNode = new Node()
-            {
-              //  data = x + x,
-                //childNode = node
-            };
-            node = newNode;
-        }
+        //for(int x = 1; x < 100; x++)
+        //{
+        //    Node newNode = new Node()
+        //    {
+        //        name = "s" + x,
+        //        positionX = x * 2,
+        //        positionY = x * 2,
+        //        positionZ = x * 2,
+        //        rotationX = x * 2,
+        //        rotationY = x * 2,
+        //        rotationZ = x * 2
+
+        //    };
+        //    newNode.children.Add(node);
+        //    node = newNode;
+        //}
         printNodes(node, "Initial");
         ModeldataSerializer serializer = new ModeldataSerializer();
         MemoryStream msTestString = new MemoryStream();
@@ -55,14 +67,14 @@ public class TestNative : MonoBehaviour {
     private void printNodes(Node node, string id)
     {
         int x = 0;
-        Node test = node;
         Debug.Log(node);
-       // Debug.Log(node.data);
-        //while(test.childNode != null && x < 100)
-        //{
-        //    Debug.Log("ID: " + id + " Node number: " + x + " data: " + test.data);
-        //    x++;
-        //   // test = test.childNode;
-        //}
+        Node test = node;
+        Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
+        while (test.children.Count != 0 && x < 100)
+        {
+            Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
+            x++;
+            test = test.children[0];
+        }
     }
 }

@@ -23,6 +23,10 @@ public class AnimationGeneratorEditor : Editor
 
     public void OnEnable()
     {
+#if UNITY_EDITOR
+        m_LastEditorUpdateTime = Time.realtimeSinceStartup;
+        EditorApplication.update += OnEditorUpdate;
+#endif
         generator = (AnimationGenerator)target;
         beginIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/begining.png", typeof(Texture2D));
         rewIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rew.png", typeof(Texture2D));
@@ -75,14 +79,20 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         GUILayout.Button(beginIcon, buttonStyle);
         GUILayout.Button(rewIcon, buttonStyle);
-        if(GUILayout.Button(playIcon, buttonStyle))
+        if (GUILayout.Button(playIcon, buttonStyle))
         {
-            generator.PlayAnimation();
+            generator.ToggleAnimation();
         }
         GUILayout.Button(ffIcon, buttonStyle);
         GUILayout.Button(endIcon, buttonStyle);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Time Between Frames");
+        generator.timeBetweenFrames = CustomGUILayout.FloatField(generator.timeBetweenFrames);
+        GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(drawButtonContent, middleButtonStyle))
@@ -183,5 +193,18 @@ public class AnimationGeneratorEditor : Editor
         }
     }
 
+    private float m_LastEditorUpdateTime;
+
+    protected virtual void OnDisable()
+    {
+#if UNITY_EDITOR
+        EditorApplication.update -= OnEditorUpdate;
+#endif
+    }
+
+    protected virtual void OnEditorUpdate()
+    {
+        generator.UpdateAnimation(m_LastEditorUpdateTime);
+    }
 
 }
