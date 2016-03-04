@@ -10,12 +10,10 @@ public class TestData {
         for(int x = 0; x < frames.Length; x++)
         {
             Node node = new Node();
-            node.positionX = points[x].x;
-            node.positionY = points[x].y;
-            node.positionZ = points[x].z;
-            node.rotationX = firstFrame.rotationX;
-            node.rotationY = firstFrame.rotationY;
-            node.rotationZ = firstFrame.rotationZ;
+            node.position.x = points[x].x;
+            node.position.y = points[x].y;
+            node.position.z = points[x].z;
+            node.eularAngles = firstFrame.eularAngles;
             node.children.AddRange(firstFrame.children);
             frames[x] = CreateFrame(node, x);
         }
@@ -24,7 +22,7 @@ public class TestData {
 
     private static Node CreateFrame(Node frame, int currentFrame)
     {
-        frame.positionX += currentFrame;
+        frame.position.x += currentFrame;
         foreach (Node childNode in frame.children)
         {
             CreateFrame(childNode, currentFrame);

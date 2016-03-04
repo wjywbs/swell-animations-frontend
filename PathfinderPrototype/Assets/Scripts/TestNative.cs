@@ -9,7 +9,7 @@ using System;
 
 public class TestNative : MonoBehaviour {
 
-    [DllImport("TestDLL")]
+    [DllImport("swell-integration")]
     private static extern IntPtr setDataNegative(byte[] a, int size, ref uint outputSize);
 
 	void Start () {
@@ -17,29 +17,29 @@ public class TestNative : MonoBehaviour {
         Node node = new Node()
         {
             name = "s" + 0,
-            positionX = 0,
-            positionY = 0,
-            positionZ = 0,
-            rotationX = 0,
-            rotationY = 0,
-            rotationZ = 0
+            //position.x = 0,
+            //positionY = 0,
+            //positionZ = 0,
+            //rotationX = 0,
+            //rotationY = 0,
+            //rotationZ = 0
         };
-        //for(int x = 1; x < 100; x++)
-        //{
-        //    Node newNode = new Node()
-        //    {
-        //        name = "s" + x,
-        //        positionX = x * 2,
-        //        positionY = x * 2,
-        //        positionZ = x * 2,
-        //        rotationX = x * 2,
-        //        rotationY = x * 2,
-        //        rotationZ = x * 2
+        for (int x = 1; x < 100; x++)
+        {
+            Node newNode = new Node()
+            {
+                //name = "s" + x,
+                //positionX = x * 2,
+                //positionY = x * 2,
+                //positionZ = x * 2,
+                //rotationX = x * 2,
+                //rotationY = x * 2,
+                //rotationZ = x * 2
 
-        //    };
-        //    newNode.children.Add(node);
-        //    node = newNode;
-        //}
+            };
+            newNode.children.Add(node);
+            node = newNode;
+        }
         printNodes(node, "Initial");
         ModeldataSerializer serializer = new ModeldataSerializer();
         MemoryStream msTestString = new MemoryStream();
@@ -69,10 +69,10 @@ public class TestNative : MonoBehaviour {
         int x = 0;
         Debug.Log(node);
         Node test = node;
-        Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
+        //Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
         while (test.children.Count != 0 && x < 100)
         {
-            Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
+            //Debug.Log("ID: " + id + " Node number: " + x + " positionX: " + test.positionX);
             x++;
             test = test.children[0];
         }

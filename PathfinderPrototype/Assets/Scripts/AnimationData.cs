@@ -8,12 +8,12 @@ public class AnimationData
     public static string NodeToString(Node node)
     {
         return "Name: " + node.name +
-        " positionX: " + node.positionX +
-        " positionY: " + node.positionY +
-        " positionX: " + node.positionZ +
-        " rotationX: " + node.rotationX +
-        " rotationY: " + node.rotationY +
-        " rotationZ: " + node.rotationZ;
+        " positionX: " + node.position.x +
+        " positionY: " + node.position.y +
+        " positionX: " + node.position.z +
+        " rotationX: " + node.eularAngles.x +
+        " rotationY: " + node.eularAngles.y +
+        " rotationZ: " + node.eularAngles.z;
     }
 
     //The following are used for debug purposes
@@ -36,15 +36,23 @@ public class AnimationData
 
     public static Node CreateNodeFromGameObject(Transform transform)
     {
+        Vector position = new Vector()
+        {
+            x = transform.position.x,
+            y = transform.position.y,
+            z = transform.position.z
+        };
+        Vector eulerAngles = new Vector()
+        {
+            x = transform.eulerAngles.x,
+            y = transform.eulerAngles.y,
+            z = transform.eulerAngles.z
+        };
         return new Node()
         {
             name = transform.gameObject.name,
-            positionX = transform.position.x,
-            positionY = transform.position.y,
-            positionZ = transform.position.z,
-            rotationX = transform.rotation.eulerAngles.x,
-            rotationY = transform.rotation.eulerAngles.y,
-            rotationZ = transform.rotation.eulerAngles.z
+            position = position,
+            eularAngles = eulerAngles
         };
     }
 
