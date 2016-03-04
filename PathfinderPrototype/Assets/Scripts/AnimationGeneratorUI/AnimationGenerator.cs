@@ -139,6 +139,11 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
+    public void GenerateAnimation()
+    {
+        frames = TestData.CreateTestAnimation(AnimationData.GenerateNode(model), points);
+    }
+
     public void AnimateFrame(int frame)
     {
         //You wold want to use the frame number to get the correct fraome
@@ -155,5 +160,6 @@ public class AnimationGenerator : MonoBehaviour
         }
 
     }
+
 
 }

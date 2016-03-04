@@ -172,6 +172,7 @@ public class AnimationGeneratorEditor : Editor
             {
                 e.Use();
                 drawing = false;
+                generator.GenerateAnimation();
             }
             blockingMouseInput = false;
         }
