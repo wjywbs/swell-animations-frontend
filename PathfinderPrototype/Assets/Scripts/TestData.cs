@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using swellanimations;
 
 public class TestData {
-    public static Node[] createTestAnimation(Node firstFrame, List<Vector3> points)
+    public static Node[] CreateTestAnimation(Node firstFrame, List<Vector3> points)
     {
         Node[] frames = new Node[points.Count];
         for(int x = 0; x < frames.Length; x++)
