@@ -9,20 +9,25 @@ public class TestData {
         Node[] frames = new Node[points.Count];
         for(int x = 0; x < frames.Length; x++)
         {
-            firstFrame.positionX = points[x].x;
-            firstFrame.positionY = points[x].y;
-            firstFrame.positionZ = points[x].z;
-            frames[x] = createFrame(firstFrame, x);
+            Node node = new Node();
+            node.positionX = points[x].x;
+            node.positionY = points[x].y;
+            node.positionZ = points[x].z;
+            node.rotationX = firstFrame.rotationX;
+            node.rotationY = firstFrame.rotationY;
+            node.rotationZ = firstFrame.rotationZ;
+            node.children.AddRange(firstFrame.children);
+            frames[x] = CreateFrame(node, x);
         }
         return frames;
     }
 
-    private static Node createFrame(Node frame, int currentFrame)
+    private static Node CreateFrame(Node frame, int currentFrame)
     {
         frame.positionX += currentFrame;
         foreach (Node childNode in frame.children)
         {
-            createFrame(childNode, currentFrame);
+            CreateFrame(childNode, currentFrame);
         }
         return frame;
     }

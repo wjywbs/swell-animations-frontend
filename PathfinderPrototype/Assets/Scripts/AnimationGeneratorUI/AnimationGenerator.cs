@@ -141,6 +141,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void GenerateAnimation()
     {
+
         frames = TestData.CreateTestAnimation(AnimationData.GenerateNode(model), points);
     }
 
