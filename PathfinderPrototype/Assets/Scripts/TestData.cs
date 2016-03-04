@@ -12,17 +12,17 @@ public class TestData {
             firstFrame.positionX = points[x].x;
             firstFrame.positionY = points[x].y;
             firstFrame.positionZ = points[x].z;
-            frames[x] = createFrame(firstFrame, x);
+            frames[x] = CreateFrame(firstFrame, x);
         }
         return frames;
     }
 
-    private static Node CreateFrame(Node frame, int currentFrame)
+    public static Node CreateFrame(Node frame, int currentFrame)
     {
-        frame.positionX += currentFrame;
+        frame.positionX += 1;
         foreach (Node childNode in frame.children)
         {
-            createFrame(childNode, currentFrame);
+            CreateFrame(childNode, currentFrame);
         }
         return frame;
     }
