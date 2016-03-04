@@ -17,7 +17,7 @@ public class TestData {
         return frames;
     }
 
-    private static Node createFrame(Node frame, int currentFrame)
+    private static Node CreateFrame(Node frame, int currentFrame)
     {
         frame.positionX += currentFrame;
         foreach (Node childNode in frame.children)
