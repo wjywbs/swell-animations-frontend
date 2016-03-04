@@ -151,10 +151,10 @@ public class AnimationGenerator : MonoBehaviour
         //ex: Node node = frames[frame];
 
         //This code I have here just moves the model to each point on the line, obviously not what we want in the final version
-        Node node = frames[frame];
+//        Node node = frames[frame];
         model.position = points[currentFrame];
-        model.position = new Vector3(0f, 0f, 0f);
-        model.rotation = Quaternion.Euler(0f, 0f, 0f);
+//        model.position = new Vector3(0f, 0f, 0f);
+//        model.rotation = Quaternion.Euler(0f, 0f, 0f);
         if (currentFrame + 1 < points.Count)
         {
             model.rotation = Quaternion.LookRotation((points[currentFrame + 1] - model.position).normalized);
