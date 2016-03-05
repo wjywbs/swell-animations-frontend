@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using swellanimations;
 
 public class AnimationData
@@ -29,12 +30,12 @@ public class AnimationData
 
     public static Node GenerateNode(Transform model)
     {
-        Node node = CreateNodeFromGameObject(model);
+        Node node = CreateParentFromeGameObject(model);
         GenerateChildren(model, node);
         return node;
     }
 
-    public static Node CreateNodeFromGameObject(Transform transform)
+    public static Node CreateParentFromeGameObject(Transform transform)
     {
         Vector position = new Vector()
         {
@@ -55,6 +56,27 @@ public class AnimationData
             eularAngles = eulerAngles
         };
     }
+    public static Node CreateNodeFromGameObject(Transform transform)
+    {
+        Vector position = new Vector()
+        {
+            x = transform.localPosition.x,
+            y = transform.localPosition.y,
+            z = transform.localPosition.z
+        };
+        Vector eulerAngles = new Vector()
+        {
+            x = transform.localEulerAngles.x,
+            y = transform.localEulerAngles.y,
+            z = transform.localEulerAngles.z
+        };
+        return new Node()
+        {
+            name = transform.gameObject.name,
+            position = position,
+            eularAngles = eulerAngles
+        };
+    }
 
     public static void GenerateChildren(Transform children, Node parent)
     {
@@ -62,9 +84,26 @@ public class AnimationData
         {
             Node child = CreateNodeFromGameObject(transform);
             child.parent = parent;
-            parent.children.Add(child);
+            //parent.children.Add(child);
             GenerateChildren(transform, child);
         }
+    }
+
+    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints)
+    {
+        ModelData modelData = new ModelData();
+        modelData.model = GenerateNode(model);
+        foreach(Vector3 point in controlPoints)
+        {
+            modelData.controlPoints.Add(new Vector()
+            {
+                x = point.x,
+                y = point.y,
+                z = point.z
+            });
+        }
+
+        return modelData;
     }
 
 }
