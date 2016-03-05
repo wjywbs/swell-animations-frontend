@@ -16,7 +16,7 @@ public class AnimationGenerator : MonoBehaviour
     public Transform model;
 
 	[SerializeField]
-	public Hashtable modelMap;
+	public Dictionary<string,Transform> modelMap;
 
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
@@ -142,13 +142,13 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
-	public Hashtable CreateHashTable(Transform loc, Hashtable tbl)
+	public Dictionary<string,Transform> CreateDictionary(Transform loc, Dictionary<string,Transform> dic)
 	{
-		tbl.Add (loc.gameObject.name, loc);
+		dic.Add (loc.gameObject.name, loc);
 		foreach (Transform t in loc) {
-			tbl = CreateHashTable (t, tbl);
+			dic = CreateDictionary(t, dic);
 		}
-		return tbl;
+		return dic;
 	}
 
     public void GenerateAnimation()
@@ -156,22 +156,26 @@ public class AnimationGenerator : MonoBehaviour
         frames = TestData.CreateTestAnimation(AnimationData.GenerateNode(model), points);
 
 		// Experimental stuff:
-		modelMap = CreateHashTable (model, new Hashtable());
-		foreach(DictionaryEntry entry in modelMap)
+		modelMap = CreateDictionary(model, new Dictionary<string,Transform>());
+		foreach(KeyValuePair<string,Transform> kvp in modelMap)
 		{
-			Debug.Log(entry.Key + ":" + entry.Value);
+			Debug.Log(kvp.Key + ":" + kvp.Value);
 		}
     }
 
-	public void SetModel(Transform t, Node n)
+	public void SetModel(Node n)
 	{
+		modelMap [n.name].position = new Vector3(
+			n.position.x,
+			n.position.y,
+			n.position.z);
 //		t.position.x = n.positionX;
 //		t.position.y = n.positionY;
 //		t.position.z = n.positionZ;
 //		t.rotation.eulerAngles.x = n.rotationX;
 //		t.rotation.eulerAngles.y = n.rotationY;
 //		t.rotation.eulerAngles.z = n.rotationZ;
-//
+
 //		foreach (Transform trans
 	}
 
