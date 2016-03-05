@@ -165,7 +165,14 @@ public class AnimationGenerator : MonoBehaviour
 
 	public void SetModel(Node n)
 	{
-		modelMap [n.name].position = new Vector3(
+		if (modelMap.ContainsKey (n.name)) {
+			Debug.Log ("map contains " + n.name);
+		} else {
+			Debug.Log ("oh shit! map doesn't contain " + n.name);
+			return;
+		}
+		Transform t = modelMap [n.name];
+		t.position = new Vector3(
 			n.position.x,
 			n.position.y,
 			n.position.z);
@@ -176,7 +183,9 @@ public class AnimationGenerator : MonoBehaviour
 //		t.rotation.eulerAngles.y = n.rotationY;
 //		t.rotation.eulerAngles.z = n.rotationZ;
 
-//		foreach (Transform trans
+//		foreach (Node child in n.children) {
+//			SetModel (child);
+//		}
 	}
 
     public void AnimateFrame(int frame)
@@ -189,7 +198,8 @@ public class AnimationGenerator : MonoBehaviour
 		//You wold want to use the frame number to get the correct fraome
         //ex: Node node = frames[frame];
 		Node node = frames[frame];
-
+		node.name = model.gameObject.name;
+		SetModel (node);
 //		Debug.Log (node.Length);
 //		foreach (Node child in node.children){
 //			// hello world
