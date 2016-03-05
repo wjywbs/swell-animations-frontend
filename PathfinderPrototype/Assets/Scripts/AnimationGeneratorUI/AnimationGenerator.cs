@@ -157,16 +157,30 @@ public class AnimationGenerator : MonoBehaviour
 
 		// Experimental stuff:
 		modelMap = CreateDictionary(model, new Dictionary<string,Transform>());
-		foreach(KeyValuePair<string,Transform> kvp in modelMap)
-		{
-			Debug.Log(kvp.Key + ":" + kvp.Value);
-		}
+//		foreach(KeyValuePair<string,Transform> kvp in modelMap)
+//		{
+//			Debug.Log(kvp.Key + ":" + kvp.Value);
+//		}
     }
+
+	public void SetModelChildren(Node n){
+		if (modelMap.ContainsKey(n.name)){
+			Debug.Log ("setting " + n.name + " to " + new Vector3(n.position.x,n.position.y,n.position.z));
+		}else{
+			Debug.Log("oh shit! map doesn't contain "+ n.name);
+			return;
+		}
+		Transform t = modelMap [n.name];
+		t.localPosition = new Vector3 (
+			n.position.x,
+			n.position.y,
+			n.position.z);
+	}
 
 	public void SetModel(Node n)
 	{
 		if (modelMap.ContainsKey (n.name)) {
-			Debug.Log ("map contains " + n.name);
+//			Debug.Log ("map contains " + n.name);
 		} else {
 			Debug.Log ("oh shit! map doesn't contain " + n.name);
 			return;
@@ -183,9 +197,9 @@ public class AnimationGenerator : MonoBehaviour
 //		t.rotation.eulerAngles.y = n.rotationY;
 //		t.rotation.eulerAngles.z = n.rotationZ;
 
-//		foreach (Node child in n.children) {
-//			SetModel (child);
-//		}
+		foreach (Node child in n.children) {
+			SetModelChildren (child);
+		}
 	}
 
     public void AnimateFrame(int frame)
