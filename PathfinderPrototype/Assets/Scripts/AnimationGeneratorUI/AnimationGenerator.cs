@@ -15,6 +15,9 @@ public class AnimationGenerator : MonoBehaviour
     [SerializeField]
     public Transform model;
 
+	[SerializeField]
+	public Hashtable modelMap;
+
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
 
@@ -139,26 +142,64 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
+	public Hashtable CreateHashTable(Transform loc, Hashtable tbl)
+	{
+		tbl.Add (loc.gameObject.name, loc);
+		foreach (Transform t in loc) {
+			tbl = CreateHashTable (t, tbl);
+		}
+		return tbl;
+	}
+
     public void GenerateAnimation()
     {
-
         frames = TestData.CreateTestAnimation(AnimationData.GenerateNode(model), points);
+
+		// Experimental stuff:
+		modelMap = CreateHashTable (model, new Hashtable());
+		foreach(DictionaryEntry entry in modelMap)
+		{
+			Debug.Log(entry.Key + ":" + entry.Value);
+		}
     }
+
+	public void SetModel(Transform t, Node n)
+	{
+//		t.position.x = n.positionX;
+//		t.position.y = n.positionY;
+//		t.position.z = n.positionZ;
+//		t.rotation.eulerAngles.x = n.rotationX;
+//		t.rotation.eulerAngles.y = n.rotationY;
+//		t.rotation.eulerAngles.z = n.rotationZ;
+//
+//		foreach (Transform trans
+	}
 
     public void AnimateFrame(int frame)
     {
-        //You wold want to use the frame number to get the correct fraome
+		if (frame >= frames.Length) {
+			Debug.Log ("oops you called me too many times. this is bad!");
+			return;
+		}
+
+		//You wold want to use the frame number to get the correct fraome
         //ex: Node node = frames[frame];
+		Node node = frames[frame];
+
+//		Debug.Log (node.Length);
+//		foreach (Node child in node.children){
+//			// hello world
+//		}
 
         //This code I have here just moves the model to each point on the line, obviously not what we want in the final version
-//        Node node = frames[frame];
-        model.position = points[currentFrame];
+//		Node node = frames [frame];
+//		model.position = points[currentFrame];
 //        model.position = new Vector3(0f, 0f, 0f);
 //        model.rotation = Quaternion.Euler(0f, 0f, 0f);
-        if (currentFrame + 1 < points.Count)
-        {
-            model.rotation = Quaternion.LookRotation((points[currentFrame + 1] - model.position).normalized);
-        }
+//        if (currentFrame + 1 < points.Count)
+//        {
+//            model.rotation = Quaternion.LookRotation((points[currentFrame + 1] - model.position).normalized);
+//        }
 
     }
 
