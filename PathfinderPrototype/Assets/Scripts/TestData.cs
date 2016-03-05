@@ -23,7 +23,7 @@ public class TestData {
 
     private static Node CreateFrame(Node frame, int currentFrame)
     {
-        frame.position.x += currentFrame;
+//        frame.position.x += currentFrame;
         foreach (Node childNode in frame.children)
         {
             CreateFrame(childNode, currentFrame);
