@@ -83,8 +83,8 @@ public class AnimationData
         foreach (Transform transform in children)
         {
             Node child = CreateNodeFromGameObject(transform);
-            child.parent = parent;
-            //parent.children.Add(child);
+            //child.parent = parent;
+            parent.children.Add(child);
             GenerateChildren(transform, child);
         }
     }
