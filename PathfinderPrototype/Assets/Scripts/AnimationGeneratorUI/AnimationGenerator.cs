@@ -198,7 +198,7 @@ public class AnimationGenerator : MonoBehaviour
 		//You wold want to use the frame number to get the correct fraome
         //ex: Node node = frames[frame];
 		Node node = frames[frame];
-		node.name = model.gameObject.name;
+//		node.name = model.gameObject.name;
 		SetModel (node);
 //		Debug.Log (node.Length);
 //		foreach (Node child in node.children){
