@@ -10,11 +10,13 @@ public class TestData {
         for(int x = 0; x < frames.Length; x++)
         {
             Node node = new Node();
+			node.position = new Vector ();
             node.position.x = points[x].x;
             node.position.y = points[x].y;
             node.position.z = points[x].z;
             node.eularAngles = firstFrame.eularAngles;
             node.children.AddRange(firstFrame.children);
+			node.name = firstFrame.name;
             frames[x] = CreateFrame(node, x);
         }
         return frames;
