@@ -92,6 +92,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(drawButtonContent, middleButtonStyle))
         {
+            generator.StopAnimation();
             generator.drawing = true;
         }
         GUILayout.FlexibleSpace();
@@ -100,7 +101,8 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(editButtonContent, middleButtonStyle))
         {
-            generator.clearPoints();
+            generator.StopAnimation();
+            generator.ClearPoints();
             SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();

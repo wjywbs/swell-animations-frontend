@@ -100,9 +100,10 @@ public class AnimationGenerator : MonoBehaviour
         drawLOA = true;
     }
 
-    public void clearPoints()
+    public void ClearPoints()
     {
         points.Clear();
+        frames = null;
     }
 
     public void calculatePlaneVectors()
@@ -219,7 +220,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void RestoreAnimation()
     {
-        if (frames == null && serializedAnimation != null && points.Count > 0)
+        if (frames == null && serializedAnimation != null && !drawing && points.Count > 0)
         {
             FillModelMap(model);
             Debug.Log("Restored using: " + serializedAnimation);
@@ -246,7 +247,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public int GetNumFrames()
     {
-        return frames.Length;
+        return frames == null ? 0 : frames.Length;
     }
 
 
