@@ -16,6 +16,7 @@ public class TestData {
             node.position.z = points[x].z;
             node.eularAngles = firstFrame.eularAngles;
             node.children.AddRange(firstFrame.children);
+			node.name = firstFrame.name;
             frames[x] = CreateFrame(node, x);
         }
         return frames;
