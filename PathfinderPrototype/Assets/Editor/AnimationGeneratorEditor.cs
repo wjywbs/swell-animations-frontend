@@ -88,7 +88,7 @@ public class AnimationGeneratorEditor : Editor
 
 				GUILayout.BeginHorizontal ();
 				GUILayout.Label ("Max Frame Rate");
-				generator.timeBetweenFrames = 1 / CustomGUILayout.FloatField (generator.timeBetweenFrames);
+				generator.timeBetweenFrames = 1 / CustomGUILayout.FloatField (generator.GetFrameRate());
 				GUILayout.EndHorizontal ();
 
 				GUILayout.BeginHorizontal ();

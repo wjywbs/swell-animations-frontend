@@ -13,14 +13,12 @@ public class AnimationGenerator : MonoBehaviour
 		public float cellHeight = 32.0f;
 		public bool drawing = false;
 
-		[SerializeField]
 		public Transform model;
 
-		[SerializeField]
-		public Dictionary<string, Transform> modelMap = new Dictionary<string, Transform> () { };
+		private Dictionary<string, Transform> modelMap = new Dictionary<string, Transform> ();
 
 		[SerializeField]
-		private List<Vector3> points = new List<Vector3> ();
+		private List<Vector3> points;
 
 		public Vector3 planeOrigin = new Vector3 ();
 		public Vector3 planeVector1 = new Vector3 ();
@@ -38,8 +36,7 @@ public class AnimationGenerator : MonoBehaviour
 
 		private int currentFrame = 0;
 
-		[SerializeField]
-		public float timeBetweenFrames = 0.1f;
+        public float timeBetweenFrames;
 		private float timeSinceLastFrame = 0.0f;
 
 		private bool animationPlaying = false;
@@ -210,6 +207,11 @@ public class AnimationGenerator : MonoBehaviour
 				Node node = frames [frame];
 				SetModel (node);
 		}
+
+        public float GetFrameRate()
+        {
+            return 1 / timeBetweenFrames;
+        }
 
 
 }
