@@ -11,12 +11,13 @@ public class AnimationGenerator : MonoBehaviour
     public int heightLines = 100;
     public float cellWidth = 32.0f;
     public float cellHeight = 32.0f;
+    public bool drawing = false;
 
     [SerializeField]
     public Transform model;
 
-	[SerializeField]
-	public Dictionary<string,Transform> modelMap;
+    [SerializeField]
+    public Dictionary<string, Transform> modelMap;
 
     [SerializeField]
     private List<Vector3> points = new List<Vector3>();
@@ -50,7 +51,7 @@ public class AnimationGenerator : MonoBehaviour
     {
         DrawGrid();
         Gizmos.color = Color.blue;
-        if(points.Count > 1)
+        if (points.Count > 1)
         {
             for (int x = 1; x < points.Count; x++)
             {
@@ -119,6 +120,11 @@ public class AnimationGenerator : MonoBehaviour
         }
         else
         {
+            if (modelMap == null)
+            {
+                modelMap = CreateDictionary(model, new Dictionary<string, Transform>());
+                GenerateAnimation();
+            }
             model.position = beginPostion;
             model.rotation = beginRotation;
             drawPlane = true;
@@ -127,8 +133,9 @@ public class AnimationGenerator : MonoBehaviour
 
     public void UpdateAnimation(float deltaTime)
     {
-        if(animationPlaying && deltaTime >= timeBetweenFrames)
+        if (animationPlaying && deltaTime >= timeBetweenFrames)
         {
+            Debug.Log("Delta time: " + deltaTime);
             if (currentFrame < points.Count)
             {
                 AnimateFrame(currentFrame);
@@ -141,100 +148,74 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
-	public Dictionary<string,Transform> CreateDictionary(Transform loc, Dictionary<string,Transform> dic)
-	{
-		dic.Add (loc.gameObject.name, loc);
-		foreach (Transform t in loc) {
-			dic = CreateDictionary(t, dic);
-		}
-		return dic;
-	}
+    public Dictionary<string, Transform> CreateDictionary(Transform loc, Dictionary<string, Transform> dic)
+    {
+        dic.Add(loc.gameObject.name, loc);
+        foreach (Transform t in loc)
+        {
+            dic = CreateDictionary(t, dic);
+        }
+        return dic;
+    }
 
     public void GenerateAnimation()
     {
-        frames = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
-        // Debug stuff
-        //AnimationData.PrintAllNodes(AnimationData.GenerateNode(model),"-");
-        //for (int x = 0; x < frames.Length; x++)
-        //{
-        //    Debug.Log("------------------------------Printing Frame " + x + "---------------------------------");
-        //    AnimationData.PrintAllNodes(frames[x], "-");
-        //    Debug.Log("-----------------------------End Printing Frame " + x + "-------------------------------");
-        //}
-		// Experimental stuff:
-		modelMap = CreateDictionary(model, new Dictionary<string,Transform>());
-//		foreach(KeyValuePair<string,Transform> kvp in modelMap)
-//		{
-//			Debug.Log(kvp.Key + ":" + kvp.Value);
-//		}
+        if (points != null && points.Count > 0)
+        {
+            frames = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
+            modelMap = CreateDictionary(model, new Dictionary<string, Transform>());
+        }
     }
 
-	public void SetModelChildren(Node n){
-		if (modelMap.ContainsKey(n.name)){
-			Debug.Log ("setting " + n.name + " to " + new Vector3(n.position.x,n.position.y,n.position.z));
-		}else{
-			Debug.Log("oh shit! map doesn't contain "+ n.name);
-			return;
-		}
-		Transform t = modelMap [n.name];
-		t.localPosition = new Vector3 (
-			n.position.x,
-			n.position.y,
-			n.position.z);
-	}
+    public void SetModelChildren(Node n)
+    {
+        if (modelMap.ContainsKey(n.name))
+        {
+            Debug.Log("setting " + n.name + " to " + new Vector3(n.position.x, n.position.y, n.position.z));
+        }
+        else
+        {
+            Debug.Log("oh shit! map doesn't contain " + n.name);
+            return;
+        }
+        Transform t = modelMap[n.name];
+        t.localPosition = new Vector3(
+            n.position.x,
+            n.position.y,
+            n.position.z);
+    }
 
-	public void SetModel(Node n)
-	{
-		if (modelMap.ContainsKey (n.name)) {
-//			Debug.Log ("map contains " + n.name);
-		} else {
-			Debug.Log ("oh shit! map doesn't contain " + n.name);
-			return;
-		}
-		Transform t = modelMap [n.name];
-		t.position = new Vector3(
-			n.position.x,
-			n.position.y,
-			n.position.z);
-//		t.position.x = n.positionX;
-//		t.position.y = n.positionY;
-//		t.position.z = n.positionZ;
-//		t.rotation.eulerAngles.x = n.rotationX;
-//		t.rotation.eulerAngles.y = n.rotationY;
-//		t.rotation.eulerAngles.z = n.rotationZ;
+    public void SetModel(Node n)
+    {
+        if (modelMap.ContainsKey(n.name))
+        {
+            Transform t = modelMap[n.name];
+            t.position = new Vector3(
+                n.position.x,
+                n.position.y,
+                n.position.z);
 
-		foreach (Node child in n.children) {
-			SetModelChildren (child);
-		}
-	}
+            foreach (Node child in n.children)
+            {
+                SetModelChildren(child);
+            }
+        }
+        else
+        {
+            Debug.Log("oh shit! map doesn't contain " + n.name);
+            return;
+        }
+    }
 
     public void AnimateFrame(int frame)
     {
-		if (frame >= frames.Length) {
-			Debug.Log ("oops you called me too many times. this is bad!");
-			return;
-		}
-
-		//You wold want to use the frame number to get the correct fraome
-        //ex: Node node = frames[frame];
-		Node node = frames[frame];
-//		node.name = model.gameObject.name;
-		SetModel (node);
-//		Debug.Log (node.Length);
-//		foreach (Node child in node.children){
-//			// hello world
-//		}
-
-        //This code I have here just moves the model to each point on the line, obviously not what we want in the final version
-//		Node node = frames [frame];
-//		model.position = points[currentFrame];
-//        model.position = new Vector3(0f, 0f, 0f);
-//        model.rotation = Quaternion.Euler(0f, 0f, 0f);
-//        if (currentFrame + 1 < points.Count)
-//        {
-//            model.rotation = Quaternion.LookRotation((points[currentFrame + 1] - model.position).normalized);
-//        }
-
+        if (frame >= frames.Length)
+        {
+            Debug.Log("oops you called me too many times. this is bad!");
+            return;
+        }
+        Node node = frames[frame];
+        SetModel(node);
     }
 
 

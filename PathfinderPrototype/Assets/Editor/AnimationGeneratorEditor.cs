@@ -18,7 +18,6 @@ public class AnimationGeneratorEditor : Editor
     Texture2D eyeIcon;
 
     bool blockingMouseInput = false;
-    static bool drawing = false;
     private Vector2 lastPoint;
 
     public void OnEnable()
@@ -97,7 +96,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(drawButtonContent, middleButtonStyle))
         {
-            drawing = true;
+            generator.drawing = true;
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -112,7 +111,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if (GUILayout.Button("Center On Drawing Plane", middleButtonStyle))
+        if (GUILayout.Button("Center On generator.drawing Plane", middleButtonStyle))
         {
             SceneView scenView = SceneView.lastActiveSceneView;
             Quaternion rotation = Quaternion.LookRotation(generator.editorPlane.normal, generator.planeVector1 * -1);
@@ -152,14 +151,14 @@ public class AnimationGeneratorEditor : Editor
     private void OnSceneGUI()
     {
         Event e = Event.current;
-        if (e.type == EventType.MouseDown && drawing)
+        if (e.type == EventType.MouseDown && generator.drawing)
         {
             blockingMouseInput = true;
 
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
-            if (drawing)
+            if (generator.drawing)
             {
                 lastPoint = e.mousePosition;
                 getWorldPointFromMousePoint(e.mousePosition);
@@ -171,12 +170,12 @@ public class AnimationGeneratorEditor : Editor
             if (blockingMouseInput)
             {
                 e.Use();
-                drawing = false;
+                generator.drawing = false;
                 generator.GenerateAnimation();
             }
             blockingMouseInput = false;
         }
-        if (e.type == EventType.Layout && drawing)
+        if (e.type == EventType.Layout && generator.drawing)
         {
             //somehow this allows e.Use() to actually function and block mouse input
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));

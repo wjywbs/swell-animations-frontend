@@ -107,4 +107,14 @@ public class AnimationData
         return modelData;
     }
 
+    public static void PrintAnimation(Node[] frames)
+    {
+        for (int x = 0; x < frames.Length; x++)
+        {
+            Debug.Log("------------------------------Printing Frame " + x + "---------------------------------");
+            AnimationData.PrintAllNodes(frames[x], "-");
+            Debug.Log("-----------------------------End Printing Frame " + x + "-------------------------------");
+        }
+    }
+
 }
