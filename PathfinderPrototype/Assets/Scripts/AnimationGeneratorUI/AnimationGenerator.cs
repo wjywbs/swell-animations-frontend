@@ -184,10 +184,11 @@ public class AnimationGenerator : MonoBehaviour
         if (modelMap.ContainsKey(n.name))
         {
             Transform t = modelMap[n.name];
-            t.localPosition = new Vector3(
+            
+            t.InverseTransformPoint(new Vector3(
                     n.position.x,
                     n.position.y,
-                    n.position.z);
+                    n.position.z));
         }
         else
         {
@@ -231,13 +232,11 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AnimateFrame()
     {
-        if (currentFrame >= frames.Length)
+        if (currentFrame < frames.Length)
         {
-            Debug.Log("oops you called me too many times. this is bad!");
-            return;
+            Node node = frames[currentFrame];
+            SetModel(node);
         }
-        Node node = frames[currentFrame];
-        SetModel(node);
     }
 
     public float GetFrameRate()

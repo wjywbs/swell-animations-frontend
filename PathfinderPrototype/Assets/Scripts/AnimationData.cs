@@ -30,12 +30,12 @@ public class AnimationData
 
     public static Node GenerateNode(Transform model)
     {
-        Node node = CreateParentFromeGameObject(model);
+        Node node = CreateNodeFromGameObject(model);
         GenerateChildren(model, node);
         return node;
     }
 
-    public static Node CreateParentFromeGameObject(Transform transform)
+    public static Node CreateNodeFromGameObject(Transform transform)
     {
         Vector position = new Vector()
         {
@@ -48,27 +48,6 @@ public class AnimationData
             x = transform.eulerAngles.x,
             y = transform.eulerAngles.y,
             z = transform.eulerAngles.z
-        };
-        return new Node()
-        {
-            name = transform.gameObject.name,
-            position = position,
-            eularAngles = eulerAngles
-        };
-    }
-    public static Node CreateNodeFromGameObject(Transform transform)
-    {
-        Vector position = new Vector()
-        {
-            x = transform.localPosition.x,
-            y = transform.localPosition.y,
-            z = transform.localPosition.z
-        };
-        Vector eulerAngles = new Vector()
-        {
-            x = transform.localEulerAngles.x,
-            y = transform.localEulerAngles.y,
-            z = transform.localEulerAngles.z
         };
         return new Node()
         {
