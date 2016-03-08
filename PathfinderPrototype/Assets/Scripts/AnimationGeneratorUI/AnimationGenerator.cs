@@ -12,6 +12,7 @@ public class AnimationGenerator : MonoBehaviour
     public float cellWidth = 32.0f;
     public float cellHeight = 32.0f;
     public bool drawing = false;
+    public BezierSpline spline;
 
     public Transform model;
 
@@ -168,6 +169,7 @@ public class AnimationGenerator : MonoBehaviour
     {
         if (points != null && points.Count > 0)
         {
+            GenerateSpline();
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
@@ -176,6 +178,25 @@ public class AnimationGenerator : MonoBehaviour
             Debug.Log("Just serialized: " + serializedAnimation);
             modelMap.Clear();
             FillModelMap(model);
+        }
+    }
+
+    public void GenerateSpline()
+    {
+        //The amount of points - 1 needs to be divisible by 3need to be
+        spline = new BezierSpline();
+        spline.transform = transform;
+        if((points.Count - 1) % 3 != 0)
+        {
+            int remainder = points.Count % 3;
+            points.RemoveRange(points.Count - remainder, remainder);
+        }
+        spline.points = points.ToArray();
+        spline.ComputeControlPoints();
+        points.Clear();
+        for(float t = 0.01f; t <= 1; t += 0.01f)
+        {
+            points.Add(spline.GetPoint(t));
         }
     }
 
