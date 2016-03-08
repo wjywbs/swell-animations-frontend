@@ -92,7 +92,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(drawButtonContent, middleButtonStyle))
         {
-            generator.StopAnimation();
+            //generator.StopAnimation();
             generator.drawing = true;
         }
         GUILayout.FlexibleSpace();
@@ -101,7 +101,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(editButtonContent, middleButtonStyle))
         {
-            generator.StopAnimation();
+            //generator.StopAnimation();
             generator.ClearPoints();
             SceneView.RepaintAll();
         }
@@ -141,7 +141,13 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
+        GUILayout.Label("Control Point Distance");
+        generator.controlPointDistance = CustomGUILayout.FloatField(generator.controlPointDistance);
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+
         GUILayout.Label("Max Frame Rate");
         generator.timeBetweenFrames = 1 / CustomGUILayout.FloatField(generator.GetFrameRate());
         GUILayout.EndHorizontal();
