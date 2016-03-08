@@ -83,9 +83,16 @@ public class AnimationData
     {
         foreach (Transform transform in children)
         {
-            Node child = CreateNodeFromGameObject(transform);
-            //child.parent = parent;
-            parent.children.Add(child);
+            Node child;
+            //For now we are only sending the spine this will change later
+            if (transform.gameObject.name.Contains("spine"))
+            {
+                child = CreateNodeFromGameObject(transform);
+                parent.children.Add(child);
+            } else
+            {
+                child = parent;
+            }
             GenerateChildren(transform, child);
         }
     }

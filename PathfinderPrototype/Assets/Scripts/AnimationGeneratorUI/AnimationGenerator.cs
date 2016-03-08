@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using swellanimations;
+using System;
 
 [AddComponentMenu("Animation/Animation Generator")]
 [System.Serializable]
@@ -12,11 +13,14 @@ public class AnimationGenerator : MonoBehaviour
     public float cellWidth = 32.0f;
     public float cellHeight = 32.0f;
     public bool drawing = false;
+    public float framesOfAnimation = 100f;
     public BezierSpline spline;
 
     public Transform model;
 
     private Dictionary<string, Transform> modelMap = new Dictionary<string, Transform>();
+    private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
+    private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
 
     [SerializeField]
     private List<Vector3> points;
@@ -128,8 +132,17 @@ public class AnimationGenerator : MonoBehaviour
     {
         currentFrame = 0;
         animationPlaying = false;
-        model.position = beginPostion;
-        model.rotation = beginRotation;
+        RestoreToOriginal(model);
+    }
+
+    public void RestoreToOriginal(Transform t)
+    {
+        t.position = originalPositionMap[t];
+        t.rotation = originalRotationMap[t];
+        foreach (Transform child in t)
+        {
+            RestoreToOriginal(child);
+        }
     }
 
     public void UpdateAnimation(float deltaTime)
@@ -159,10 +172,19 @@ public class AnimationGenerator : MonoBehaviour
     public void FillModelMap(Transform loc)
     {
         modelMap.Add(loc.gameObject.name, loc);
+        originalPositionMap.Add(loc, loc.position);
+        originalRotationMap.Add(loc, loc.rotation);
         foreach (Transform t in loc)
         {
             FillModelMap(t);
         }
+    }
+
+    public void ClearMaps()
+    {
+        modelMap.Clear();
+        originalPositionMap.Clear();
+        originalRotationMap.Clear();
     }
 
     public void GenerateAnimation()
@@ -176,46 +198,80 @@ public class AnimationGenerator : MonoBehaviour
             frames = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             Debug.Log("Just serialized: " + serializedAnimation);
-            modelMap.Clear();
+            ClearMaps();
             FillModelMap(model);
+            for (int x = 0; x < frames.Length; x++)
+            {
+                if (x < frames.Length - 1)
+                {
+                    nextNodeMap.Clear();
+                    mapNextNode(frames[x + 1]);
+                }
+                CalculateRotations(frames[x]);
+            }
         }
     }
 
     public void GenerateSpline()
     {
-        //The amount of points - 1 needs to be divisible by 3need to be
+        //The amount of points - 1 needs to be divisible by 3
         spline = new BezierSpline();
         spline.transform = transform;
-        if((points.Count - 1) % 3 != 0)
+        if ((points.Count - 1) % 3 != 0)
         {
-            int remainder = points.Count % 3;
+            int remainder = (points.Count - 1) % 3;
             points.RemoveRange(points.Count - remainder, remainder);
         }
         spline.points = points.ToArray();
         spline.ComputeControlPoints();
         points.Clear();
-        for(float t = 0.01f; t <= 1; t += 0.01f)
+        for (float t = 0f; t < 1; t += 1 / framesOfAnimation)
         {
             points.Add(spline.GetPoint(t));
         }
     }
 
-    public void SetModelChildren(Node n)
+    public void CalculateRotations(Node n)
     {
-        if (modelMap.ContainsKey(n.name))
+        Transform t = modelMap[n.name];
+        Vector3 newPosition = new Vector3(
+                n.position.x,
+                n.position.y,
+                n.position.z);
+        Vector nextFrame = nextNodeMap[n.name].position;
+        Vector3 nextPosition = new Vector3(nextFrame.x, nextFrame.y, nextFrame.z);
+        Vector3 forward = (nextPosition - newPosition).normalized;
+        Quaternion rotation = Quaternion.LookRotation(forward);
+        n.eularAngles.x = rotation.eulerAngles.x;
+        n.eularAngles.y = rotation.eulerAngles.y;
+        n.eularAngles.z = rotation.eulerAngles.z;
+        foreach (Node child in n.children)
         {
-            Transform t = modelMap[n.name];
-            
-            t.localPosition = t.InverseTransformPoint(new Vector3(
-                    n.position.x,
-                    n.position.y,
-                    n.position.z));
+            CalculateRotations(child);
         }
-        else
+    }
+
+    
+    Dictionary<string, Node> nextNodeMap = new Dictionary<string, Node>();
+    public void mapNextNode(Node node)
+    {
+        nextNodeMap.Add(node.name, node);
+        foreach (Node child in node.children)
         {
-            Debug.Log("oh shit! map doesn't contain " + n.name);
-            return;
+            mapNextNode(child);
         }
+    }
+
+    public bool CheckDistances(Transform t, Vector3 newPosition)
+    {
+        foreach (Transform o in modelMap.Values)
+        {
+            if (o != t && Vector3.Distance(newPosition, o.position) < Vector3.Distance(t.position, o.position))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void SetModel(Node n)
@@ -223,11 +279,20 @@ public class AnimationGenerator : MonoBehaviour
         if (modelMap.ContainsKey(n.name))
         {
             Transform t = modelMap[n.name];
-            t.position = new Vector3(
-                    n.position.x,
-                    n.position.y,
-                    n.position.z);
-
+            
+            //Vector3 newPosition = new Vector3(
+            //        n.position.x,
+            //        n.position.y,
+            //        n.position.z);
+            //if (CheckDistances(t, newPosition))
+            //{
+            //    t.position = newPosition;
+                t.eulerAngles = new Vector3(
+                    n.eularAngles.x,
+                    n.eularAngles.y,
+                    n.eularAngles.z
+               );
+            //}
             foreach (Node child in n.children)
             {
                 SetModel(child);
@@ -244,6 +309,7 @@ public class AnimationGenerator : MonoBehaviour
     {
         if (frames == null && serializedAnimation != null && !drawing && points.Count > 0)
         {
+            ClearMaps();
             FillModelMap(model);
             Debug.Log("Restored using: " + serializedAnimation);
             frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
@@ -255,10 +321,14 @@ public class AnimationGenerator : MonoBehaviour
     {
         if (currentFrame < frames.Length)
         {
-            Node node = frames[currentFrame];
-            SetModel(node);
-            AnimationData.PrintAllNodes(node,"-");
-            AnimationData.PrintAllTransforms(model, "-");
+            Node n = frames[currentFrame];
+            model.position = new Vector3(
+                     n.position.x,
+                     n.position.y,
+                     n.position.z);
+             SetModel(n);
+            //AnimationData.PrintAllNodes(node,"-");
+            //AnimationData.PrintAllTransforms(model, "-");
         }
     }
 
@@ -271,6 +341,4 @@ public class AnimationGenerator : MonoBehaviour
     {
         return frames == null ? 0 : frames.Length;
     }
-
-
 }
