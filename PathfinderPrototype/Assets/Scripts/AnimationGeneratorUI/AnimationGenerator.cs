@@ -185,7 +185,7 @@ public class AnimationGenerator : MonoBehaviour
         {
             Transform t = modelMap[n.name];
             
-            t.InverseTransformPoint(new Vector3(
+            t.localPosition = t.InverseTransformPoint(new Vector3(
                     n.position.x,
                     n.position.y,
                     n.position.z));
@@ -209,7 +209,7 @@ public class AnimationGenerator : MonoBehaviour
 
             foreach (Node child in n.children)
             {
-                SetModelChildren(child);
+                SetModel(child);
             }
         }
         else
@@ -236,6 +236,8 @@ public class AnimationGenerator : MonoBehaviour
         {
             Node node = frames[currentFrame];
             SetModel(node);
+            AnimationData.PrintAllNodes(node,"-");
+            AnimationData.PrintAllTransforms(model, "-");
         }
     }
 

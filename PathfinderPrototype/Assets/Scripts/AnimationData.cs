@@ -8,13 +8,13 @@ public class AnimationData
 
     public static string NodeToString(Node node)
     {
-        return "Name: " + node.name +
-        " positionX: " + node.position.x +
-        " positionY: " + node.position.y +
-        " positionX: " + node.position.z +
-        " rotationX: " + node.eularAngles.x +
-        " rotationY: " + node.eularAngles.y +
-        " rotationZ: " + node.eularAngles.z;
+        return "Node Name: " + node.name +
+        " Node positionX: " + node.position.x +
+        " Node positionY: " + node.position.y +
+        " Node positionX: " + node.position.z +
+        " Node rotationX: " + node.eularAngles.x +
+        " Node rotationY: " + node.eularAngles.y +
+        " Node rotationZ: " + node.eularAngles.z;
     }
 
     //The following are used for debug purposes
@@ -24,6 +24,28 @@ public class AnimationData
         foreach (Node childNode in node.children)
         {
             PrintAllNodes(childNode, spacing + "-");
+        }
+
+    }
+
+    public static string TransformToString(Transform node)
+    {
+        return "transform Name: " + node.name +
+        " transform positionX: " + node.position.x +
+        " transform positionY: " + node.position.y +
+        " transform positionX: " + node.position.z +
+        " transform rotationX: " + node.eulerAngles.x +
+        " transform rotationY: " + node.eulerAngles.y +
+        " transform rotationZ: " + node.eulerAngles.z;
+    }
+
+    //The following are used for debug purposes
+    public static void PrintAllTransforms(Transform node, string spacing)
+    {
+        Debug.Log(spacing + TransformToString(node)); ;
+        foreach (Transform childNode in node)
+        {
+            PrintAllTransforms(childNode, spacing + "-");
         }
 
     }
