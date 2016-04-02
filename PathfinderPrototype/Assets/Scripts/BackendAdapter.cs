@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using swellanimations;
@@ -10,7 +10,7 @@ using System;
 public class BackendAdapter
 {
 
-		[DllImport ("swell-integration")]
+		[DllImport ("swell-animations")]
 		private static extern IntPtr generateAnimation (byte[] a, int size, ref uint outputSize);
 
 		public static Node[] GenerateFromBackend (ModelData modelData)
