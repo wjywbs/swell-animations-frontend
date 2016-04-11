@@ -13,7 +13,7 @@ public class AnimationGenerator : MonoBehaviour
     public float cellWidth = 32.0f;
     public float cellHeight = 32.0f;
     public bool drawing = false;
-    public float framesOfAnimation = 100f;
+    public int framesOfAnimation = 100;
 
     [SerializeField]
     public Transform model;
@@ -194,7 +194,9 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
+            ModelData modelData = AnimationData.CreateModelData(model, points);
+            modelData.numberOfFrames = framesOfAnimation;
+            swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
             points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3(v.x, v.y, v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
