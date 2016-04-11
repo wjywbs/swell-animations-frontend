@@ -188,6 +188,10 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e7ea8e40e80b54e4faa4a758f1e8ea6f, type: 2}
   m_IsPrefabParent: 0
+--- !u!4 &1284447828 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 457372, guid: 73669b1b6d7c44d4889e063f8c97f499, type: 2}
+  m_PrefabInternal: {fileID: 2131966950}
 --- !u!1 &1388745566
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,11 +320,7 @@ Prefab:
     - target: {fileID: 11434456, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: model
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 186712, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
-      propertyPath: m_Name
-      value: Animation Generator Test
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1284447828}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
   m_IsPrefabParent: 0

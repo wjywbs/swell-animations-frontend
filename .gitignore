@@ -8,3 +8,7 @@ PathfinderPrototype/obj/
 PathfinderPrototype/PathfinderPrototype.userprefs
 PathfinderPrototype/Assets/Plugins/*.meta
 PathfinderPrototype/.vs/
+*.exp
+*.ilk
+*.lib
+*.pdb

@@ -16,6 +16,7 @@ public class AnimationGenerator : MonoBehaviour
     public float framesOfAnimation = 100f;
     public BezierSpline spline;
 
+    [SerializeField]
     public Transform model;
 
     private Dictionary<string, Transform> modelMap = new Dictionary<string, Transform>();
