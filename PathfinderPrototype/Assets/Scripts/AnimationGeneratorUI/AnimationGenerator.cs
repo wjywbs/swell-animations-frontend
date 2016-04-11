@@ -14,7 +14,6 @@ public class AnimationGenerator : MonoBehaviour
     public float cellHeight = 32.0f;
     public bool drawing = false;
     public float framesOfAnimation = 100f;
-    public BezierSpline spline;
 
     [SerializeField]
     public Transform model;
@@ -192,87 +191,17 @@ public class AnimationGenerator : MonoBehaviour
     {
         if (points != null && points.Count > 0)
         {
-            GenerateSpline();
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            frames = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
+            swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(AnimationData.CreateModelData(model, points));
+            frames = animation.frames.ToArray();
+            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3(v.x, v.y, v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
-            Debug.Log("Just serialized: " + serializedAnimation);
+            //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
             FillModelMap(model);
-            for (int x = 0; x < frames.Length; x++)
-            {
-                if (x < frames.Length - 1)
-                {
-                    nextNodeMap.Clear();
-                    mapNextNode(frames[x + 1]);
-                }
-                CalculateRotations(frames[x]);
-            }
         }
-    }
-
-    public void GenerateSpline()
-    {
-        //The amount of points - 1 needs to be divisible by 3
-        spline = new BezierSpline();
-        spline.transform = transform;
-        if ((points.Count - 1) % 3 != 0)
-        {
-            int remainder = (points.Count - 1) % 3;
-            points.RemoveRange(points.Count - remainder, remainder);
-        }
-        spline.points = points.ToArray();
-        spline.ComputeControlPoints();
-        points.Clear();
-        for (float t = 0f; t < 1; t += 1 / framesOfAnimation)
-        {
-            points.Add(spline.GetPoint(t));
-        }
-    }
-
-    public void CalculateRotations(Node n)
-    {
-        Transform t = modelMap[n.name];
-        Vector3 newPosition = new Vector3(
-                n.position.x,
-                n.position.y,
-                n.position.z);
-        Vector nextFrame = nextNodeMap[n.name].position;
-        Vector3 nextPosition = new Vector3(nextFrame.x, nextFrame.y, nextFrame.z);
-        Vector3 forward = (nextPosition - newPosition).normalized;
-        Quaternion rotation = Quaternion.LookRotation(forward);
-        n.eularAngles.x = rotation.eulerAngles.x;
-        n.eularAngles.y = rotation.eulerAngles.y;
-        n.eularAngles.z = rotation.eulerAngles.z;
-        foreach (Node child in n.children)
-        {
-            CalculateRotations(child);
-        }
-    }
-
-    
-    Dictionary<string, Node> nextNodeMap = new Dictionary<string, Node>();
-    public void mapNextNode(Node node)
-    {
-        nextNodeMap.Add(node.name, node);
-        foreach (Node child in node.children)
-        {
-            mapNextNode(child);
-        }
-    }
-
-    public bool CheckDistances(Transform t, Vector3 newPosition)
-    {
-        foreach (Transform o in modelMap.Values)
-        {
-            if (o != t && Vector3.Distance(newPosition, o.position) < Vector3.Distance(t.position, o.position))
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     public void SetModel(Node n)
@@ -280,29 +209,15 @@ public class AnimationGenerator : MonoBehaviour
         if (modelMap.ContainsKey(n.name))
         {
             Transform t = modelMap[n.name];
-            
-            //Vector3 newPosition = new Vector3(
-            //        n.position.x,
-            //        n.position.y,
-            //        n.position.z);
-            //if (CheckDistances(t, newPosition))
-            //{
-            //    t.position = newPosition;
-                t.eulerAngles = new Vector3(
-                    n.eularAngles.x,
-                    n.eularAngles.y,
-                    n.eularAngles.z
-               );
-            //}
+            //t.eulerAngles = new Vector3(
+            //    n.eularAngles.x,
+            //    n.eularAngles.y,
+            //    n.eularAngles.z
+            //);
             foreach (Node child in n.children)
             {
                 SetModel(child);
             }
-        }
-        else
-        {
-            Debug.Log("oh shit! map doesn't contain " + n.name);
-            return;
         }
     }
 
@@ -327,7 +242,7 @@ public class AnimationGenerator : MonoBehaviour
                      n.position.x,
                      n.position.y,
                      n.position.z);
-             SetModel(n);
+            SetModel(n);
             //AnimationData.PrintAllNodes(node,"-");
             //AnimationData.PrintAllTransforms(model, "-");
         }
