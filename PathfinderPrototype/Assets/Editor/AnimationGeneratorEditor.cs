@@ -55,9 +55,9 @@ public class AnimationGeneratorEditor : Editor
         editButtonContent.image = pencilIcon;
         editButtonContent.text = "Clear LOA";
 
-        //GUIContent rotationButtonContent = new GUIContent();
-        //rotationButtonContent.image = rotationIcon;
-        //rotationButtonContent.text = "Add Rotation Point";
+        GUIContent rotationButtonContent = new GUIContent();
+        rotationButtonContent.image = rotationIcon;
+        rotationButtonContent.text = "Add Rotation Point";
 
         GUIContent hideLOAButtonContent = new GUIContent();
         hideLOAButtonContent.image = eyeIcon;
@@ -118,11 +118,14 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
-        //GUILayout.BeginHorizontal();
-        //GUILayout.FlexibleSpace();
-        //GUILayout.Button(rotationButtonContent, middleButtonStyle);
-        //GUILayout.FlexibleSpace();
-        //GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if(GUILayout.Button(rotationButtonContent, middleButtonStyle))
+        {
+
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if(GUILayout.Button(hideLOAButtonContent, middleButtonStyle))
