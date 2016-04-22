@@ -30,7 +30,7 @@ public class FindClosestIntersect
     }
 
 
-    public static Vector3 GetClosestPointOnLineSegment(Vector3 A, Vector3 B, Vector3 P)
+    private static Vector3 GetClosestPointOnLineSegment(Vector3 A, Vector3 B, Vector3 P)
     {
         Vector3 AP = P - A;       //Vector from A to P   
         Vector3 AB = B - A;       //Vector from A to B  
