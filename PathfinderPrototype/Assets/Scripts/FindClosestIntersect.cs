@@ -16,6 +16,7 @@ public class FindClosestIntersect
             Vector3 pointB = curve[x + 1];
             closestPoint = GetClosestPointOnLineSegment(pointA, pointB, point);
             float distance = Vector3.Distance(closestPoint, point);
+            Debug.Log(distance);
             if (distance < closestDistance)
             {
                 ret = closestPoint;

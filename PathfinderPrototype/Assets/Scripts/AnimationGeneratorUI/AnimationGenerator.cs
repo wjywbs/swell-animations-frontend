@@ -24,8 +24,8 @@ public class AnimationGenerator : MonoBehaviour
 		private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion> ();
 
 		[SerializeField]
-		private List<Vector3> points;
-		private List<Vector3> rotations;
+		private List<Vector3> points = new List<Vector3>();
+		private List<Vector3> rotations = new List<Vector3>();
 
 		public Vector3 planeOrigin = new Vector3 ();
 		public Vector3 planeVector1 = new Vector3 ();
@@ -121,9 +121,11 @@ public class AnimationGenerator : MonoBehaviour
 				frames = null;
 		}
 
-		public void addRotation(Vector3 rotation)
+		public void addRotation(Vector3 mouseLocation)
 		{
-			rotations.Add(rotation);
+			Vector3 closestPoint = FindClosestIntersect.search(points, mouseLocation);
+			rotations.Add(closestPoint);
+			Debug.Log(rotations);
 		}
 
 		public void ClearRotations()

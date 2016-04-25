@@ -199,6 +199,7 @@ public class AnimationGeneratorEditor : Editor
                 Vector3 point = ray.GetPoint(rayDistance);
                 generator.addRotation(point);
             }
+            
         }
         if (e.type == EventType.MouseDown && generator.drawing)
         {
