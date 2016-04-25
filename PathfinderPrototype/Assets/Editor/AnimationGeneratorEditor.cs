@@ -13,6 +13,7 @@ public class AnimationGeneratorEditor : Editor
     Texture2D pencilIcon;
     Texture2D stopIcon;
     Texture2D rotationIcon;
+    Texture2D clearIcon;
     Texture2D eyeIcon;
 
     bool blockingMouseInput = false;
@@ -30,6 +31,7 @@ public class AnimationGeneratorEditor : Editor
         stopIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/stop.png", typeof(Texture2D));
         pencilIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil.png", typeof(Texture2D));
         rotationIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rotation.png", typeof(Texture2D));
+        clearIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/clear-rotation.png", typeof(Texture2D));
         eyeIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eye_open.png", typeof(Texture2D));
     }
 
@@ -58,6 +60,10 @@ public class AnimationGeneratorEditor : Editor
         GUIContent rotationButtonContent = new GUIContent();
         rotationButtonContent.image = rotationIcon;
         rotationButtonContent.text = "Add Rotation Point";
+
+        GUIContent rotationButtonClear = new GUIContent();
+        rotationButtonClear.image = clearIcon;
+        rotationButtonClear.text = "Clear Rotation Points";
 
         GUIContent hideLOAButtonContent = new GUIContent();
         hideLOAButtonContent.image = eyeIcon;
@@ -124,6 +130,14 @@ public class AnimationGeneratorEditor : Editor
         {
             Debug.Log("hello world, from roation point code.!");
             generator.drawRotPt = !generator.drawRotPt;
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if(GUILayout.Button(rotationButtonClear, middleButtonStyle))
+        {
+            Debug.Log("CLEARNING.!");
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
