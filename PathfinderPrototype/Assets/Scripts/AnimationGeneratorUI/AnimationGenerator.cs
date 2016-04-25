@@ -73,7 +73,9 @@ public class AnimationGenerator : MonoBehaviour
 						}
 				}
 				if (drawRotPt) {
-					DrawRotationPoint(mouseLocation);
+					if (rotations.Count > 1) {
+						DrawRotationPoint(mouseLocation);
+					}
 				}
 		}
 
@@ -81,7 +83,9 @@ public class AnimationGenerator : MonoBehaviour
 		{
 			Gizmos.color = Color.yellow;
             // Debug.Log(location);
-			Gizmos.DrawSphere(location, 1);
+			for (int x = 0; x < rotations.Count; ++x) {
+				Gizmos.DrawSphere(rotations[x], 1);
+			}
 			Debug.Log("drawing sphere!");
 		}
 
@@ -119,7 +123,7 @@ public class AnimationGenerator : MonoBehaviour
 				frames = null;
 		}
 
-		public void addRotation(Vector3 roation)
+		public void addRotation(Vector3 rotation)
 		{
 			rotations.Add(rotation);
 		}

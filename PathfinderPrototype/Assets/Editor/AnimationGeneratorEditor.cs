@@ -201,7 +201,7 @@ public class AnimationGeneratorEditor : Editor
             if (generator.editorPlane.Raycast(ray, out rayDistance))
             {
                 Vector3 point = ray.GetPoint(rayDistance);
-                generator.mouseLocation = point;
+                generator.addRotation(point);
             }
         }
         if (e.type == EventType.Layout && generator.drawing)
