@@ -13,6 +13,7 @@ public class AnimationGenerator : MonoBehaviour
 		public float cellWidth = 32.0f;
 		public float cellHeight = 32.0f;
 		public bool drawing = false;
+		public bool rotating = false;
 		public int framesOfAnimation = 100;
 
 		[SerializeField]
@@ -54,12 +55,11 @@ public class AnimationGenerator : MonoBehaviour
 		private Quaternion beginRotation;
 		public bool drawPlane = true;
 		public bool drawLOA = true;
-		public bool drawRotPt = true;
 
 		[SerializeField]
 		private string serializedAnimation;
 
-		public Vector3 mouseLocation;
+		public Vector3 mouseLocation = new Vector3();
 
 		void OnDrawGizmos ()
 		{
@@ -72,10 +72,8 @@ public class AnimationGenerator : MonoBehaviour
 								}
 						}
 				}
-				if (drawRotPt) {
-					if (rotations.Count > 1) {
-						DrawRotationPoint(mouseLocation);
-					}
+				if (rotations.Count > 1) {
+					DrawRotationPoint(mouseLocation);
 				}
 		}
 

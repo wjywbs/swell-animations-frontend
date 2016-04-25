@@ -100,6 +100,7 @@ public class AnimationGeneratorEditor : Editor
         {
             //generator.StopAnimation();
             generator.drawing = true;
+            generator.rotating = false;
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -129,7 +130,7 @@ public class AnimationGeneratorEditor : Editor
         if(GUILayout.Button(rotationButtonContent, middleButtonStyle))
         {
             Debug.Log("hello world, from roation point code.!");
-            generator.drawRotPt = !generator.drawRotPt;
+            generator.rotating = true;
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -187,6 +188,15 @@ public class AnimationGeneratorEditor : Editor
     private void OnSceneGUI()
     {
         Event e = Event.current;
+        if (e.type == EventType.MouseDown && generator.rotating) {
+            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+            float rayDistance;
+            if (generator.editorPlane.Raycast(ray, out rayDistance))
+            {
+                Vector3 point = ray.GetPoint(rayDistance);
+                generator.addRotation(point);
+            }
+        }
         if (e.type == EventType.MouseDown && generator.drawing)
         {
             blockingMouseInput = true;
@@ -210,14 +220,6 @@ public class AnimationGeneratorEditor : Editor
                 generator.GenerateAnimation();
             }
             blockingMouseInput = false;
-
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            float rayDistance;
-            if (generator.editorPlane.Raycast(ray, out rayDistance))
-            {
-                Vector3 point = ray.GetPoint(rayDistance);
-                generator.addRotation(point);
-            }
         }
         if (e.type == EventType.Layout && generator.drawing)
         {
