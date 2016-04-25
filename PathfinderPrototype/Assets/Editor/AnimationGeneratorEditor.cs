@@ -138,6 +138,7 @@ public class AnimationGeneratorEditor : Editor
         if(GUILayout.Button(rotationButtonClear, middleButtonStyle))
         {
             Debug.Log("CLEARNING.!");
+            generator.ClearRotations();
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
