@@ -35,6 +35,7 @@ private static string activeFloatFieldString = "";
    
     // Get stored string for the text field if this one is recorded
     string str = recorded? activeFloatFieldString : value.ToString ();
+    Debug.Log("Hello WOrld");
    
     // pass it in the text field
     string strValue = GUI.TextField (pos, str);

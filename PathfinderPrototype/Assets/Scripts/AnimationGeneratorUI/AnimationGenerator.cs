@@ -24,6 +24,7 @@ public class AnimationGenerator : MonoBehaviour
 
 		[SerializeField]
 		private List<Vector3> points;
+		private List<Vector3> rotations;
 
 		public Vector3 planeOrigin = new Vector3 ();
 		public Vector3 planeVector1 = new Vector3 ();
@@ -53,9 +54,12 @@ public class AnimationGenerator : MonoBehaviour
 		private Quaternion beginRotation;
 		public bool drawPlane = true;
 		public bool drawLOA = true;
+		public bool drawRotPt = true;
 
 		[SerializeField]
 		private string serializedAnimation;
+
+		public Vector3 mouseLocation;
 
 		void OnDrawGizmos ()
 		{
@@ -68,8 +72,18 @@ public class AnimationGenerator : MonoBehaviour
 								}
 						}
 				}
+				if (drawRotPt) {
+					DrawRotationPoint(mouseLocation);
+				}
 		}
 
+		public void DrawRotationPoint(Vector3 location)
+		{
+			Gizmos.color = Color.yellow;
+            // Debug.Log(location);
+			Gizmos.DrawSphere(location, 1);
+			Debug.Log("drawing sphere!");
+		}
 
 		void DrawGrid ()
 		{
@@ -103,6 +117,16 @@ public class AnimationGenerator : MonoBehaviour
 		{
 				points.Clear ();
 				frames = null;
+		}
+
+		public void addRotation(Vector3 roation)
+		{
+			rotations.Add(rotation);
+		}
+
+		public void ClearRotations()
+		{
+			rotations.Clear();
 		}
 
 		public void calculatePlaneVectors ()
