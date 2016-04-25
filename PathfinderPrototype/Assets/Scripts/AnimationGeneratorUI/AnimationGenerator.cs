@@ -72,7 +72,7 @@ public class AnimationGenerator : MonoBehaviour
 								}
 						}
 				}
-				if (rotations.Count > 1) {
+				if (rotations.Count > 0) {
 					DrawRotationPoint(mouseLocation);
 				}
 		}

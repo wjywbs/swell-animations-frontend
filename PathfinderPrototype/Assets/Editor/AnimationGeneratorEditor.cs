@@ -140,6 +140,7 @@ public class AnimationGeneratorEditor : Editor
         {
             Debug.Log("CLEARNING.!");
             generator.ClearRotations();
+            SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
