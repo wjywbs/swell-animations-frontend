@@ -23,13 +23,15 @@ public class BezierCurveInspector : Editor
         Vector3 p2 = ShowPoint(2);
         Vector3 p3 = ShowPoint(3);
 
+        //More handle stuff
         Handles.color = Color.gray;
         Handles.DrawLine(p0, p1);
         Handles.DrawLine(p2, p3);
 
         Handles.color = Color.white;
-        // Vector3 lineStart = curve.GetPoint(0f);
-        Handles.color = Color.green; ShowDirections();
+        Vector3 lineStart = curve.GetPoint(0f);
+        Handles.color = Color.green;
+        ShowDirections();
         Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
     }
 
@@ -49,9 +51,11 @@ public class BezierCurveInspector : Editor
     {
         Vector3 point = handleTransform.TransformPoint(curve.points[index]);
         EditorGUI.BeginChangeCheck();
+        //look at this Carlo  
         point = Handles.DoPositionHandle(point, handleRotation);
         if (EditorGUI.EndChangeCheck())
         {
+           
             Undo.RecordObject(curve, "Move Point");
             EditorUtility.SetDirty(curve);
             curve.points[index] = handleTransform.InverseTransformPoint(point);
