@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using swellanimations;
 using System;
+using UnityEditor;
 
 [AddComponentMenu ("Animation/Animation Generator")]
 [System.Serializable]
@@ -82,6 +83,9 @@ public class AnimationGenerator : MonoBehaviour
 			Gizmos.color = Color.yellow;
             // Debug.Log(location);
 			for (int x = 0; x < rotations.Count; ++x) {
+				Quaternion q = new Quaternion();
+				Vector3 distance = new Vector3(0, 3, 0);
+				Handles.RotationHandle(q, rotations[x]);
 				Gizmos.DrawSphere(rotations[x], 1);
 			}
 			Debug.Log("drawing sphere!");
