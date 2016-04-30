@@ -17,7 +17,7 @@ public class AnimationGeneratorEditor : Editor
     Texture2D clearIcon;
     Texture2D eyeIcon;
 
-    bool blockingMouseInput = false;
+    bool blockingMouseInputForDrawing = false;
     private Vector2 lastPoint;
 
     public void OnEnable()
@@ -53,11 +53,15 @@ public class AnimationGeneratorEditor : Editor
 
         GUIContent drawButtonContent = new GUIContent();
         drawButtonContent.image = pencilIcon;
-        drawButtonContent.text = "Edit LOA";
+        drawButtonContent.text = "Draw LOA";
 
         GUIContent editButtonContent = new GUIContent();
-        editButtonContent.image = eraserIcon;
-        editButtonContent.text = "Clear LOA";
+        editButtonContent.image = pencilIcon;
+        editButtonContent.text = "Edit LOA";
+
+        GUIContent clearButtonContent = new GUIContent();
+        clearButtonContent.image = eraserIcon;
+        clearButtonContent.text = "Clear LOA";
 
         GUIContent rotationButtonContent = new GUIContent();
         rotationButtonContent.image = rotationIcon;
@@ -101,14 +105,30 @@ public class AnimationGeneratorEditor : Editor
         if (GUILayout.Button(drawButtonContent, middleButtonStyle))
         {
             //generator.StopAnimation();
-            generator.drawing = true;
+            generator.drawingLOA = true;
             generator.rotating = false;
+            generator.editingLOA = false;
+            blockingMouseInputForDrawing = true;
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(editButtonContent, middleButtonStyle))
+        {
+            //edit line            
+            generator.editingLOA = true;
+            generator.drawingLOA = false;
+            generator.rotating = false;
+            blockingMouseInputForDrawing = true;
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button(clearButtonContent, middleButtonStyle))
         {
             //generator.StopAnimation();
             generator.ClearPoints();
@@ -116,6 +136,7 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Center On Drawing Plane", middleButtonStyle))
@@ -127,18 +148,22 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if(GUILayout.Button(rotationButtonContent, middleButtonStyle))
+        if (GUILayout.Button(rotationButtonContent, middleButtonStyle))
         {
             Debug.Log("hello world, from roation point code.!");
             generator.rotating = true;
+            generator.editingLOA = false;
+            generator.drawingLOA = false;
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if(GUILayout.Button(rotationButtonClear, middleButtonStyle))
+        if (GUILayout.Button(rotationButtonClear, middleButtonStyle))
         {
             Debug.Log("CLEARNING.!");
             generator.ClearRotations();
@@ -146,18 +171,20 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if(GUILayout.Button(hideLOAButtonContent, middleButtonStyle))
+        if (GUILayout.Button(hideLOAButtonContent, middleButtonStyle))
         {
-            generator.drawLOA = !generator.drawLOA;
+            generator.renderLOA = !generator.renderLOA;
             SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if(GUILayout.Button(hideDrawingPlaneButtonContent, middleButtonStyle))
+        if (GUILayout.Button(hideDrawingPlaneButtonContent, middleButtonStyle))
         {
             generator.drawPlane = !generator.drawPlane;
             SceneView.RepaintAll();
@@ -169,6 +196,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.Label("Frames of Animation");
         generator.framesOfAnimation = (int)CustomGUILayout.FloatField((float)generator.framesOfAnimation);
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
 
         GUILayout.Label("Max Frame Rate");
@@ -191,55 +219,68 @@ public class AnimationGeneratorEditor : Editor
     private void OnSceneGUI()
     {
         Event e = Event.current;
-        if (e.type == EventType.MouseDown && generator.rotating) {
-            Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            float rayDistance;
-            if (generator.editorPlane.Raycast(ray, out rayDistance))
-            {
-                Vector3 point = ray.GetPoint(rayDistance);
-                generator.addRotation(point);
-            }
-        }
-        if (e.type == EventType.MouseDown && generator.drawing)
+        if (e.type == EventType.MouseDown)
         {
-            blockingMouseInput = true;
-
+            if (generator.rotating)
+            {
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+                generator.AddRotation(point);
+            }
+            else if (generator.editingLOA)
+            {
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+                generator.EditStart(point);
+            }
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
-            if (generator.drawing)
+            if (blockingMouseInputForDrawing)
             {
                 lastPoint = e.mousePosition;
-                getWorldPointFromMousePoint(e.mousePosition);
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+                if (generator.drawingLOA)
+                {
+                    generator.AddPoint(point);
+                }
+                else if (generator.editingLOA)
+                {
+                    generator.AddEditPoint(point);
+                }
+                else
+                {
+                    blockingMouseInputForDrawing = false;
+                }
                 SceneView.RepaintAll();
             }
         }
         else if (e.type == EventType.MouseUp)
         {
-            if (blockingMouseInput)
+            if (blockingMouseInputForDrawing)
             {
                 e.Use();
-                generator.drawing = false;
+                generator.drawingLOA = false;
+                if (generator.editingLOA)
+                {
+                    Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+                    generator.EditEnd(point);
+                }
                 generator.GenerateAnimation();
             }
-            blockingMouseInput = false;
+            blockingMouseInputForDrawing = false;
         }
-        if (e.type == EventType.Layout && generator.drawing)
+        if (e.type == EventType.Layout && blockingMouseInputForDrawing)
         {
             //somehow this allows e.Use() to actually function and block mouse input
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
     }
 
-    private void getWorldPointFromMousePoint(Vector3 mousePoint)
+    private Vector3 getWorldPointFromMousePoint(Vector3 mousePoint)
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(mousePoint);
         float rayDistance;
-        if (generator.editorPlane.Raycast(ray, out rayDistance))
-        {
-            Vector3 point = ray.GetPoint(rayDistance);
-            generator.addPoint(point);
-        }
+        generator.editorPlane.Raycast(ray, out rayDistance);
+        return ray.GetPoint(rayDistance);
     }
 
     private float m_LastEditorUpdateTime;
