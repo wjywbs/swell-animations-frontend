@@ -112,14 +112,16 @@ public class AnimationGenerator : MonoBehaviour
         {
             Gizmos.color = Color.yellow;
             // Debug.Log(location);
-			for (int x = 0; x < rotations.Count; ++x) {
-				Quaternion q = new Quaternion();
-				Vector3 distance = new Vector3(0, 3, 0);
-				Handles.RotationHandle(q, rotations[x]);
-				Gizmos.DrawSphere(rotations[x], 1);
-			}
-			Debug.Log("drawing sphere!");
-		}
+            for (int x = 0; x < rotations.Count; ++x)
+            {
+                Quaternion q = new Quaternion();
+                Vector3 distance = new Vector3(0, 3, 0);
+                Handles.RotationHandle(q, rotations[x]);
+                Gizmos.DrawSphere(rotations[x], 1);
+            }
+            Debug.Log("drawing sphere!");
+        }
+    }
 
     void DrawGrid()
     {
@@ -160,7 +162,7 @@ public class AnimationGenerator : MonoBehaviour
 
 		public void AddRotation(Vector3 mouseLocation)
 		{
-			Vector3 closestPoint = FindClosestIntersect.search(points, mouseLocation);
+			Vector3 closestPoint = FindClosestIntersect.Search(points, mouseLocation);
 			rotations.Add(closestPoint);
 			Debug.Log(rotations);
 		}
