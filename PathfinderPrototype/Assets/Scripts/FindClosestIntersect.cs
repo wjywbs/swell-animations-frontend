@@ -4,11 +4,17 @@ using System.Collections.Generic;
 
 public class FindClosestIntersect
 {
-    public static Vector3 search(IList<Vector3> curve, Vector3 point)
+    public static Vector3 Search(IList<Vector3> curve, Vector3 point)
     {
-        
+        int x;
+        return Search(curve, point, out x);
+    }
+
+    public static Vector3 Search(IList<Vector3> curve, Vector3 point, out int index)
+    {
         Vector3 closestPoint;
-        Vector3 ret = curve[curve.Count - 1];
+        index = curve.Count - 1;
+        Vector3 ret = curve[index];
         float closestDistance = Vector3.Distance(ret, point);
         for (int x = 0; x < curve.Count - 1; x++)
         {
@@ -21,6 +27,7 @@ public class FindClosestIntersect
             {
                 ret = closestPoint;
                 closestDistance = distance;
+                index = x;
                 if (distance == 0)
                 {
                     break;

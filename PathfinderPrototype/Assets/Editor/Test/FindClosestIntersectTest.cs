@@ -23,34 +23,39 @@ public class FindClosestIntersectTest : MonoBehaviour
     [Test]
     public void testIntersectPoint()
     {
+        int index;
         Vector3 testPoint = new Vector3(4, 2, 0);
-
-        Vector3 closestPoint = FindClosestIntersect.search(createCurve(), testPoint);
+        Vector3 closestPoint = FindClosestIntersect.Search(createCurve(), testPoint, out index);
 
         Assert.That(closestPoint, Is.Not.Null);
         Assert.That(closestPoint, Is.EqualTo(testPoint));
+        Assert.That(index, Is.EqualTo(2));
     }
 
     [Test]
     public void testClosePoint()
     {
+        int index;
         Vector3 testPoint = new Vector3(4, 2.1f, 0);
 
-        Vector3 closestPoint = FindClosestIntersect.search(createCurve(), testPoint);
+        Vector3 closestPoint = FindClosestIntersect.Search(createCurve(), testPoint, out index);
 
         Assert.That(closestPoint, Is.Not.Null);
         Assert.That(Vector3.Distance(closestPoint, testPoint), Is.LessThanOrEqualTo(0.1f));
+        Assert.That(index, Is.EqualTo(2));
     }
 
     [Test]
     public void testFarPoint()
     {
+        int index;
         Vector3 testPoint = new Vector3(5, 13, 0);
 
-        Vector3 closestPoint = FindClosestIntersect.search(createCurve(), testPoint);
+        Vector3 closestPoint = FindClosestIntersect.Search(createCurve(), testPoint, out index);
 
         Assert.That(closestPoint, Is.Not.Null);
         Assert.That(Vector3.Distance(closestPoint, testPoint), Is.GreaterThanOrEqualTo(10));
+        Assert.That(index, Is.EqualTo(2));
     }
 
 }
