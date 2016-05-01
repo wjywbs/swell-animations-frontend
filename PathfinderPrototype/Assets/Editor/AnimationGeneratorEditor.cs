@@ -220,14 +220,15 @@ public class AnimationGeneratorEditor : Editor
         Event e = Event.current;
         if (e.type == EventType.MouseDown)
         {
+            Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+            generator.mouseLocation = point;
+
             if (generator.addingRotationPoint)
             {
-                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.AddRotationPoint(point);
             }
             else if (generator.editingLOA)
             {
-                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.EditStart(point);
             }
         }
