@@ -120,8 +120,6 @@ public class AnimationGenerator : MonoBehaviour
             return;
         }
 
-        // Debug.Log("id: " + GUIUtility.keyboardControl);
-
         foreach (RotationPoint rotPoint in rotationPoints)
         {
             Gizmos.color = Color.yellow;
@@ -133,7 +131,7 @@ public class AnimationGenerator : MonoBehaviour
             model.Translate(rotPoint.position);
             model.Rotate(rotPoint.rotation.eulerAngles);
 
-            Gizmos.color = Color.green;
+            // Gizmos.color = Color.green;
             // Gizmos.DrawLine(rotPoint.position, (model.up * 1.1f + rotPoint.position));
             Handles.ArrowCap(0, rotPoint.position, rotPoint.rotation * Quaternion.Euler(-90, 0, 0), 2 * RotationPointRadius);
 
@@ -148,12 +146,12 @@ public class AnimationGenerator : MonoBehaviour
         {
             foreach (RotationPoint rotPoint in rotationPoints)
             {
-                if (selectedRotationPoint != rotPoint.controlID
+                if (selectedRotationPoint != rotPoint.index
                     && Vector3.Distance(rotPoint.position, mouseLocation) <= RotationPointRadius + SELECT_RANGE) {
-                    selectedRotationPoint = rotPoint.controlID;
+                    selectedRotationPoint = rotPoint.index;
                 }
 
-                if (selectedRotationPoint != rotPoint.controlID) {
+                if (selectedRotationPoint != rotPoint.index) {
                     continue;
                 }
 
@@ -214,8 +212,6 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
         rotationPoint.index = index;
-        rotationPoint.controlID = GUIUtility.GetControlID(index, FocusType.Passive);
-        Debug.Log("adding controlID:"+rotationPoint.controlID);
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;
@@ -224,7 +220,6 @@ public class AnimationGenerator : MonoBehaviour
             if(rotPoint.index > index)
             {
                 rotPoint.index++;
-                rotPoint.controlID = GUIUtility.GetControlID(rotPoint.index, FocusType.Passive);
             }
         }
         GenerateAnimation();
