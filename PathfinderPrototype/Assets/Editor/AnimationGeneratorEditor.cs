@@ -225,11 +225,20 @@ public class AnimationGeneratorEditor : Editor
 
             if (generator.addingRotationPoint)
             {
+                Undo.RecordObject(generator, "Add Rotation Point");
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.AddRotationPoint(point);
+                EditorUtility.SetDirty(generator);
             }
             else if (generator.editingLOA)
             {
+                Undo.RecordObject(generator, "Edit LOA");
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.EditStart(point);
+            }
+            else if(generator.drawingLOA)
+            {
+                Undo.RecordObject(generator, "Draw LOA");
             }
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
@@ -263,7 +272,8 @@ public class AnimationGeneratorEditor : Editor
                 {
                     Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                     generator.EditEnd(point);
-                }
+                }                     
+                EditorUtility.SetDirty(generator);
                 generator.GenerateAnimation();
             }
             blockingMouseInputForDrawing = false;
@@ -273,7 +283,36 @@ public class AnimationGeneratorEditor : Editor
             //somehow this allows e.Use() to actually function and block mouse input
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
-        generator.RotationPointHandles();
+        RotationPointHandles();
+    }
+
+    public void RotationPointHandles()
+    {
+        if (generator.rotationPoints.Count > 0)
+        {
+            foreach (RotationPoint rotPoint in generator.rotationPoints)
+            {
+                if (generator.selectedRotationPointIndex != rotPoint.index
+                    && Vector3.Distance(rotPoint.position, generator.mouseLocation) <= AnimationGenerator.ROTATION_POINT_RADIUS + AnimationGenerator.SELECT_RANGE)
+                {
+                    generator.selectedRotationPointIndex = rotPoint.index;
+                }
+
+                if (generator.selectedRotationPointIndex != rotPoint.index)
+                {
+                    continue;
+                }
+
+                EditorGUI.BeginChangeCheck();
+                Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(this, "Rotate Rotation Point");
+                    EditorUtility.SetDirty(this);
+                    rotPoint.rotation = rot;
+                }
+            }
+        }
     }
 
     private Vector3 getWorldPointFromMousePoint(Vector3 mousePoint)

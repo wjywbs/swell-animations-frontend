@@ -10,6 +10,7 @@ using UnityEditor;
 public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
+    public const float ROTATION_POINT_RADIUS = 1;
 
     public int widthLines = 100;
     public int heightLines = 100;
@@ -20,7 +21,6 @@ public class AnimationGenerator : MonoBehaviour
     public bool addingRotationPoint = false;
     public int framesOfAnimation = 100;
 
-    float RotationPointRadius = 1;
 
     private Quaternion handleRotation = Quaternion.identity;
 
@@ -39,7 +39,7 @@ public class AnimationGenerator : MonoBehaviour
     private List<Vector3> points;
 
     [SerializeField]
-    private List<RotationPoint> rotationPoints;
+    public List<RotationPoint> rotationPoints { get; private set; }
 
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();
@@ -73,7 +73,7 @@ public class AnimationGenerator : MonoBehaviour
     [SerializeField]
     private string serializedAnimation;
 
-    private int selectedRotationPoint = 0;
+    public int selectedRotationPointIndex = 0;
 
     public Vector3 mouseLocation = new Vector3();
 
@@ -123,7 +123,7 @@ public class AnimationGenerator : MonoBehaviour
         foreach (RotationPoint rotPoint in rotationPoints)
         {
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(rotPoint.position, RotationPointRadius);
+            Gizmos.DrawWireSphere(rotPoint.position, ROTATION_POINT_RADIUS);
 
             Vector3 prevPosition = model.position;
             Quaternion prevRotation = model.rotation;
@@ -133,37 +133,10 @@ public class AnimationGenerator : MonoBehaviour
 
             // Gizmos.color = Color.green;
             // Gizmos.DrawLine(rotPoint.position, (model.up * 1.1f + rotPoint.position));
-            Handles.ArrowCap(0, rotPoint.position, rotPoint.rotation * Quaternion.Euler(-90, 0, 0), 2 * RotationPointRadius);
+            Handles.ArrowCap(0, rotPoint.position, rotPoint.rotation * Quaternion.Euler(-90, 0, 0), 2 * ROTATION_POINT_RADIUS);
 
             model.position = prevPosition;
             model.rotation = prevRotation;
-        }
-    }
-
-    public void RotationPointHandles()
-    {
-        if (rotationPoints.Count > 0)
-        {
-            foreach (RotationPoint rotPoint in rotationPoints)
-            {
-                if (selectedRotationPoint != rotPoint.index
-                    && Vector3.Distance(rotPoint.position, mouseLocation) <= RotationPointRadius + SELECT_RANGE) {
-                    selectedRotationPoint = rotPoint.index;
-                }
-
-                if (selectedRotationPoint != rotPoint.index) {
-                    continue;
-                }
-
-                EditorGUI.BeginChangeCheck();
-                Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RecordObject(this, "Rotate rotationPoint");
-                    EditorUtility.SetDirty(this);
-                    rotPoint.rotation = rot;
-                }
-            }
         }
     }
 
