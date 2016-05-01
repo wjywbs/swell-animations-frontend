@@ -105,7 +105,7 @@ public class AnimationGeneratorEditor : Editor
         {
             //generator.StopAnimation();
             generator.drawingLOA = true;
-            generator.rotating = false;
+            generator.addingRotationPoint = false;
             generator.editingLOA = false;
             blockingMouseInputForDrawing = true;
         }
@@ -119,7 +119,7 @@ public class AnimationGeneratorEditor : Editor
             //edit line            
             generator.editingLOA = true;
             generator.drawingLOA = false;
-            generator.rotating = false;
+            generator.addingRotationPoint = false;
             blockingMouseInputForDrawing = true;
         }
         GUILayout.FlexibleSpace();
@@ -131,6 +131,7 @@ public class AnimationGeneratorEditor : Editor
         {
             //generator.StopAnimation();
             generator.ClearPoints();
+            generator.ClearRotationPoints();
             SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();
@@ -152,8 +153,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(rotationButtonContent, middleButtonStyle))
         {
-            Debug.Log("hello world, from roation point code.!");
-            generator.rotating = true;
+            generator.addingRotationPoint = true;
             generator.editingLOA = false;
             generator.drawingLOA = false;
         }
@@ -165,7 +165,7 @@ public class AnimationGeneratorEditor : Editor
         if (GUILayout.Button(rotationButtonClear, middleButtonStyle))
         {
             Debug.Log("CLEARNING.!");
-            generator.ClearRotations();
+            generator.ClearRotationPoints();
             SceneView.RepaintAll();
         }
         GUILayout.FlexibleSpace();
@@ -220,10 +220,10 @@ public class AnimationGeneratorEditor : Editor
         Event e = Event.current;
         if (e.type == EventType.MouseDown)
         {
-            if (generator.rotating)
+            if (generator.addingRotationPoint)
             {
                 Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
-                generator.AddRotation(point);
+                generator.AddRotationPoint(point);
             }
             else if (generator.editingLOA)
             {
@@ -272,6 +272,7 @@ public class AnimationGeneratorEditor : Editor
             //somehow this allows e.Use() to actually function and block mouse input
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
+        generator.RotationPointHandles();
     }
 
     private Vector3 getWorldPointFromMousePoint(Vector3 mousePoint)

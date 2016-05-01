@@ -97,7 +97,7 @@ public class AnimationData
         }
     }
 
-    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints)
+    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints)
     {
         ModelData modelData = new ModelData();
         modelData.model = GenerateNode(model);
@@ -109,6 +109,20 @@ public class AnimationData
                 x = point.x,
                 y = point.y,
                 z = point.z
+            });
+        }
+        foreach(RotationPoint rotPoint in rotationPoints)
+        {
+            modelData.rotationpoints.Add(new swellanimations.RotationPoint()
+            {
+                numFrames = 10,
+                startFrame = rotPoint.index,
+                Rotation = new Vector()
+                {
+                    x = rotPoint.rotation.eulerAngles.x,
+                    y = rotPoint.rotation.eulerAngles.y,
+                    z = rotPoint.rotation.eulerAngles.z
+                }
             });
         }
 

@@ -17,8 +17,11 @@ public class AnimationGenerator : MonoBehaviour
     public float cellHeight = 32.0f;
     public bool drawingLOA = false;
     public bool editingLOA = false;
-    public bool rotating = false;
+    public bool addingRotationPoint = false;
     public int framesOfAnimation = 100;
+
+
+    private Quaternion handleRotation = Quaternion.identity;
 
     private int editStartIndex = 0;
     private int editEndIndex = 0;
@@ -31,9 +34,11 @@ public class AnimationGenerator : MonoBehaviour
     private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
     private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
 
-		[SerializeField]
-		private List<Vector3> points = new List<Vector3>();
-		private List<Vector3> rotations = new List<Vector3>();
+    [SerializeField]
+    private List<Vector3> points;
+
+    [SerializeField]
+    private List<RotationPoint> rotationPoints;
 
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();
@@ -67,6 +72,8 @@ public class AnimationGenerator : MonoBehaviour
     [SerializeField]
     private string serializedAnimation;
 
+    private RotationPoint selectedRotationPoint;
+
     public Vector3 mouseLocation = new Vector3();
 
     void OnDrawGizmos()
@@ -74,12 +81,12 @@ public class AnimationGenerator : MonoBehaviour
         DrawGrid();
         DrawLOA();
         DrawEditLine();
-        DrawRotationPoint(mouseLocation);
+        DrawRotationPoint();
     }
 
     void DrawEditLine()
     {
-        if(editingLOA)
+        if (editingLOA)
         {
             DrawLine(editPoints, Color.red);
         }
@@ -106,20 +113,41 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
-    public void DrawRotationPoint(Vector3 location)
+    public void DrawRotationPoint()
     {
-        if (rotations.Count > 0)
+        if (rotationPoints.Count > 0)
         {
-            Gizmos.color = Color.yellow;
-            // Debug.Log(location);
-            for (int x = 0; x < rotations.Count; ++x)
+            foreach (RotationPoint rotPoint in rotationPoints)
             {
-                Quaternion q = new Quaternion();
-                Vector3 distance = new Vector3(0, 3, 0);
-                Handles.RotationHandle(q, rotations[x]);
-                Gizmos.DrawSphere(rotations[x], 1);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(rotPoint.position, 1);
+                Vector3 prevPosition = model.position;
+                Quaternion prevRotation = model.rotation;
+                model.Translate(rotPoint.position);
+                model.Rotate(rotPoint.rotation.eulerAngles);
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(rotPoint.position, (model.up + rotPoint.position) * 1.1f);
+                model.position = prevPosition;
+                model.rotation = prevRotation;
             }
-            Debug.Log("drawing sphere!");
+        }
+    }
+
+    public void RotationPointHandles()
+    {
+        if (rotationPoints.Count > 0)
+        {
+            foreach (RotationPoint rotPoint in rotationPoints)
+            {
+                EditorGUI.BeginChangeCheck();
+                Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(this, "Rotate rotationPoint");
+                    EditorUtility.SetDirty(this);
+                    rotPoint.rotation = rot;
+                }
+            }
         }
     }
 
@@ -160,16 +188,30 @@ public class AnimationGenerator : MonoBehaviour
         frames = null;
     }
 
-		public void AddRotation(Vector3 mouseLocation)
-		{
-			Vector3 closestPoint = FindClosestIntersect.Search(points, mouseLocation);
-			rotations.Add(closestPoint);
-			Debug.Log(rotations);
-		}
-
-    public void ClearRotations()
+    public void AddRotationPoint(Vector3 mouseLocation)
     {
-        rotations.Clear();
+        int index;
+        Vector3 closestPoint = FindClosestIntersect.Search(points, mouseLocation, out index);
+        RotationPoint rotationPoint = new RotationPoint();
+        rotationPoint.position = closestPoint;
+        rotationPoint.rotation = Quaternion.identity;
+        rotationPoint.index = index;
+        rotationPoints.Add(rotationPoint);
+        points.Insert(index, closestPoint);
+        addingRotationPoint = false;
+        foreach(RotationPoint rotPoint in rotationPoints)
+        {
+            if(rotPoint.index > index)
+            {
+                rotPoint.index++;
+            }
+        }
+        GenerateAnimation();
+    }
+
+    public void ClearRotationPoints()
+    {
+        rotationPoints.Clear();
     }
 
     public void calculatePlaneVectors()
@@ -255,7 +297,7 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            ModelData modelData = AnimationData.CreateModelData(model, points);
+            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
@@ -328,7 +370,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void EditStart(Vector3 point)
     {
-        if(points.Count > 0)
+        if (points.Count > 0)
         {
             editPoints.Clear();
             Vector3 pointOnLine = FindClosestIntersect.Search(points, point, out editStartIndex);
@@ -351,14 +393,22 @@ public class AnimationGenerator : MonoBehaviour
     {
         Vector3 pointOnLine = FindClosestIntersect.Search(points, point, out editEndIndex);
         editPoints.Add(pointOnLine);
-        if(editStartIndex > editEndIndex)
+        if (editStartIndex > editEndIndex)
         {
             int temp = editStartIndex;
             editStartIndex = editEndIndex;
             editEndIndex = temp;
             editPoints.Reverse();
+            List<RotationPoint> newRotPointList = new List<RotationPoint>();
+            foreach(RotationPoint rotPoint in rotationPoints)
+            {
+                if(rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
+                {
+                    newRotPointList.Add(rotPoint);
+                }
+            }
+            rotationPoints = newRotPointList;
         }
-        Debug.Log("Start: " + editStartIndex + " End: " + editEndIndex);
         points.RemoveRange(editStartIndex, editEndIndex - editStartIndex + 1);
         points.InsertRange(editStartIndex, editPoints);
         editingLOA = false;

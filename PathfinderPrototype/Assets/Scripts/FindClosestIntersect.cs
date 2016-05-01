@@ -10,6 +10,22 @@ public class FindClosestIntersect
         return Search(curve, point, out x);
     }
 
+    public static int SearchForClosestIndex(IList<Vector3> curve, Vector3 point)
+    {
+        int closestIndex = 0;
+        float closestDistance = Vector3.Distance(curve[0], point);
+        for(int x = 1; x < curve.Count; x++)
+        {
+            float distance = Vector3.Distance(curve[x], point);
+            if(distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestIndex = x;
+            }
+        }
+        return closestIndex;
+    }
+
     public static Vector3 Search(IList<Vector3> curve, Vector3 point, out int index)
     {
         Vector3 closestPoint;
@@ -22,7 +38,6 @@ public class FindClosestIntersect
             Vector3 pointB = curve[x + 1];
             closestPoint = GetClosestPointOnLineSegment(pointA, pointB, point);
             float distance = Vector3.Distance(closestPoint, point);
-            Debug.Log(distance);
             if (distance < closestDistance)
             {
                 ret = closestPoint;
@@ -61,4 +76,5 @@ public class FindClosestIntersect
         }
 
     }
+
 }
