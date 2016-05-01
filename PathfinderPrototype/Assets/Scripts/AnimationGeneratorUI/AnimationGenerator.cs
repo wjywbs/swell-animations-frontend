@@ -38,7 +38,7 @@ public class AnimationGenerator : MonoBehaviour
     private List<Vector3> points;
 
     [SerializeField]
-    private List<RotationPoint> rotationPoints;
+    public List<RotationPoint> rotationPoints { get { return rotationPoints; } }
 
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();
@@ -137,24 +137,6 @@ public class AnimationGenerator : MonoBehaviour
 
             model.position = prevPosition;
             model.rotation = prevRotation;
-        }
-    }
-
-    public void RotationPointHandles()
-    {
-        if (rotationPoints.Count > 0)
-        {
-            foreach (RotationPoint rotPoint in rotationPoints)
-            {
-                EditorGUI.BeginChangeCheck();
-                Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
-                if (EditorGUI.EndChangeCheck())
-                {
-                    Undo.RecordObject(this, "Rotate rotationPoint");
-                    EditorUtility.SetDirty(this);
-                    rotPoint.rotation = rot;
-                }
-            }
         }
     }
 
