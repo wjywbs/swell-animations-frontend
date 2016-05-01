@@ -226,14 +226,12 @@ public class AnimationGeneratorEditor : Editor
             if (generator.addingRotationPoint)
             {
                 Undo.RecordObject(generator, "Add Rotation Point");
-                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.AddRotationPoint(point);
                 EditorUtility.SetDirty(generator);
             }
             else if (generator.editingLOA)
             {
                 Undo.RecordObject(generator, "Edit LOA");
-                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 generator.EditStart(point);
             }
             else if(generator.drawingLOA)

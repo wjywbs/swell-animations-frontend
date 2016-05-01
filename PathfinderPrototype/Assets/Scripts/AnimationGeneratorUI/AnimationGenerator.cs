@@ -116,7 +116,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void DrawRotationPoint()
     {
-        if (rotationPoints.Count < 1) {
+        if (rotationPoints == null || rotationPoints.Count < 1) {
             return;
         }
 
