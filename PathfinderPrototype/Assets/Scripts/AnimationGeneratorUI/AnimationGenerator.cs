@@ -205,7 +205,10 @@ public class AnimationGenerator : MonoBehaviour
 
     public void ClearRotationPoints()
     {
-        rotationPoints.Clear();
+        if (rotationPoints != null)
+        {
+            rotationPoints.Clear();
+        }
     }
 
     public void calculatePlaneVectors()
