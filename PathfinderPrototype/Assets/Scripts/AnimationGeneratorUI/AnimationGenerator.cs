@@ -36,7 +36,7 @@ public class AnimationGenerator : MonoBehaviour
     private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
 
     [SerializeField]
-    private List<Vector3> points;
+    public List<Vector3> points { get; private set; }
 
     [SerializeField]
     public List<RotationPoint> rotationPoints { get; private set; }
@@ -103,14 +103,17 @@ public class AnimationGenerator : MonoBehaviour
 
     void DrawLine(List<Vector3> line, Color color)
     {
-        Gizmos.color = color;
-        if (line.Count > 1)
+        if (line != null)
         {
-            for (int x = 1; x < line.Count; x++)
+            Gizmos.color = color;
+            if (line.Count > 1)
             {
-                Gizmos.DrawLine(line[x - 1], line[x]);
-            }
+                for (int x = 1; x < line.Count; x++)
+                {
+                    Gizmos.DrawLine(line[x - 1], line[x]);
+                }
 
+            }
         }
     }
 
@@ -396,16 +399,16 @@ public class AnimationGenerator : MonoBehaviour
             editStartIndex = editEndIndex;
             editEndIndex = temp;
             editPoints.Reverse();
-            List<RotationPoint> newRotPointList = new List<RotationPoint>();
-            foreach (RotationPoint rotPoint in rotationPoints)
-            {
-                if (rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
-                {
-                    newRotPointList.Add(rotPoint);
-                }
-            }
-            rotationPoints = newRotPointList;
         }
+        List<RotationPoint> newRotPointList = new List<RotationPoint>();
+        foreach (RotationPoint rotPoint in rotationPoints)
+        {
+            if (rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
+            {
+                newRotPointList.Add(rotPoint);
+            }
+        }
+        rotationPoints = newRotPointList;
         points.RemoveRange(editStartIndex, editEndIndex - editStartIndex + 1);
         points.InsertRange(editStartIndex, editPoints);
         editingLOA = false;

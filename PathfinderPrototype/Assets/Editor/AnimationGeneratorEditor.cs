@@ -129,10 +129,12 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(clearButtonContent, middleButtonStyle))
         {
+            Undo.RecordObject(generator, "Clearing LOA");
             //generator.StopAnimation();
             generator.ClearPoints();
             generator.ClearRotationPoints();
             SceneView.RepaintAll();
+            EditorUtility.SetDirty(generator);
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -164,9 +166,10 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(rotationButtonClear, middleButtonStyle))
         {
-            Debug.Log("CLEARNING.!");
+            Undo.RecordObject(generator, "Clearing Rotation Points");
             generator.ClearRotationPoints();
             SceneView.RepaintAll();
+            EditorUtility.SetDirty(generator);
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -238,6 +241,7 @@ public class AnimationGeneratorEditor : Editor
             {
                 Undo.RecordObject(generator, "Draw LOA");
             }
+            Undo.FlushUndoRecordObjects();
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
@@ -273,6 +277,7 @@ public class AnimationGeneratorEditor : Editor
                 }                     
                 EditorUtility.SetDirty(generator);
                 generator.GenerateAnimation();
+                Undo.FlushUndoRecordObjects();
             }
             blockingMouseInputForDrawing = false;
         }
@@ -305,9 +310,10 @@ public class AnimationGeneratorEditor : Editor
                 Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(this, "Rotate Rotation Point");
-                    EditorUtility.SetDirty(this);
+                    Undo.RecordObject(generator, "Rotate Rotation Point");
+                    EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
+                    Undo.FlushUndoRecordObjects();
                 }
             }
         }
