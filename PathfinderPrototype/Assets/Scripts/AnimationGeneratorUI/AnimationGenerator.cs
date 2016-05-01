@@ -116,7 +116,8 @@ public class AnimationGenerator : MonoBehaviour
 
     public void DrawRotationPoint()
     {
-        if (rotationPoints == null || rotationPoints.Count < 1) {
+        if (rotationPoints == null || rotationPoints.Count < 1)
+        {
             return;
         }
 
@@ -180,6 +181,10 @@ public class AnimationGenerator : MonoBehaviour
     public void AddRotationPoint(Vector3 mouseLocation)
     {
         int index;
+        if (rotationPoints == null)
+        {
+            rotationPoints = new List<RotationPoint>();
+        }
         Vector3 closestPoint = FindClosestIntersect.Search(points, mouseLocation, out index);
         RotationPoint rotationPoint = new RotationPoint();
         rotationPoint.position = closestPoint;
@@ -188,9 +193,9 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;
-        foreach(RotationPoint rotPoint in rotationPoints)
+        foreach (RotationPoint rotPoint in rotationPoints)
         {
-            if(rotPoint.index > index)
+            if (rotPoint.index > index)
             {
                 rotPoint.index++;
             }
@@ -338,9 +343,9 @@ public class AnimationGenerator : MonoBehaviour
         {
             Node n = frames[currentFrame];
             model.position = new Vector3(
-                    n.position.x,
-                    n.position.y,
-                    n.position.z);
+                n.position.x,
+                n.position.y,
+                n.position.z);
             SetModel(n);
             //AnimationData.PrintAllNodes(node,"-");
             //AnimationData.PrintAllTransforms(model, "-");
@@ -389,9 +394,9 @@ public class AnimationGenerator : MonoBehaviour
             editEndIndex = temp;
             editPoints.Reverse();
             List<RotationPoint> newRotPointList = new List<RotationPoint>();
-            foreach(RotationPoint rotPoint in rotationPoints)
+            foreach (RotationPoint rotPoint in rotationPoints)
             {
-                if(rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
+                if (rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
                 {
                     newRotPointList.Add(rotPoint);
                 }

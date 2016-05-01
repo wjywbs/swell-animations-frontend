@@ -234,7 +234,7 @@ public class AnimationGeneratorEditor : Editor
                 Undo.RecordObject(generator, "Edit LOA");
                 generator.EditStart(point);
             }
-            else if(generator.drawingLOA)
+            else if (generator.drawingLOA)
             {
                 Undo.RecordObject(generator, "Draw LOA");
             }
@@ -286,7 +286,7 @@ public class AnimationGeneratorEditor : Editor
 
     public void RotationPointHandles()
     {
-        if (generator.rotationPoints.Count > 0)
+        if (generator.rotationPoints != null && generator.rotationPoints.Count > 0)
         {
             foreach (RotationPoint rotPoint in generator.rotationPoints)
             {
