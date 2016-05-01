@@ -115,21 +115,28 @@ public class AnimationGenerator : MonoBehaviour
 
     public void DrawRotationPoint()
     {
-        if (rotationPoints.Count > 0)
+        if (rotationPoints.Count < 1) {
+            return;
+        }
+
+        foreach (RotationPoint rotPoint in rotationPoints)
         {
-            foreach (RotationPoint rotPoint in rotationPoints)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(rotPoint.position, 1);
-                Vector3 prevPosition = model.position;
-                Quaternion prevRotation = model.rotation;
-                model.Translate(rotPoint.position);
-                model.Rotate(rotPoint.rotation.eulerAngles);
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(rotPoint.position, (model.up + rotPoint.position) * 1.1f);
-                model.position = prevPosition;
-                model.rotation = prevRotation;
-            }
+            float radius = 1;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(rotPoint.position, radius);
+
+            Vector3 prevPosition = model.position;
+            Quaternion prevRotation = model.rotation;
+
+            model.Translate(rotPoint.position);
+            model.Rotate(rotPoint.rotation.eulerAngles);
+
+            Gizmos.color = Color.green;
+            // Gizmos.DrawLine(rotPoint.position, (model.up * 1.1f + rotPoint.position));
+            Handles.ArrowCap(0, rotPoint.position, rotPoint.rotation * Quaternion.Euler(-90, 0, 0), 2 * radius);
+
+            model.position = prevPosition;
+            model.rotation = prevRotation;
         }
     }
 
