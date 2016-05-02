@@ -11,6 +11,7 @@ public class AnimationGeneratorEditor : Editor
     Texture2D pauseIcon;
     Texture2D eraserIcon;
     Texture2D pencilIcon;
+    Texture2D pencilEditIcon;
     Texture2D stopIcon;
     Texture2D rotationIcon;
     Texture2D clearIcon;
@@ -31,6 +32,7 @@ public class AnimationGeneratorEditor : Editor
         pauseIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pause.png", typeof(Texture2D));
         stopIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/stop.png", typeof(Texture2D));
         pencilIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil.png", typeof(Texture2D));
+        pencilEditIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil-edit.png", typeof(Texture2D));
         eraserIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eraser.png", typeof(Texture2D));
         rotationIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rotation.png", typeof(Texture2D));
         clearIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/clear-rotation.png", typeof(Texture2D));
@@ -57,7 +59,7 @@ public class AnimationGeneratorEditor : Editor
         drawButtonContent.text = "Draw LOA";
 
         GUIContent editButtonContent = new GUIContent();
-        editButtonContent.image = pencilIcon;
+        editButtonContent.image = pencilEditIcon;
         editButtonContent.text = "Edit LOA";
 
         GUIContent clearButtonContent = new GUIContent();
