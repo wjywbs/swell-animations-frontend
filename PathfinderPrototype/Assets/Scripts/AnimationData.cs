@@ -111,19 +111,22 @@ public class AnimationData
                 z = point.z
             });
         }
-        foreach(RotationPoint rotPoint in rotationPoints)
+        if (rotationPoints != null)
         {
-            modelData.rotationpoints.Add(new swellanimations.RotationPoint()
+            foreach (RotationPoint rotPoint in rotationPoints)
             {
-                numFrames = 10,
-                startFrame = rotPoint.index,
-                Rotation = new Vector()
+                modelData.rotationpoints.Add(new swellanimations.RotationPoint()
                 {
-                    x = rotPoint.rotation.eulerAngles.x,
-                    y = rotPoint.rotation.eulerAngles.y,
-                    z = rotPoint.rotation.eulerAngles.z
-                }
-            });
+                    numFrames = 10,
+                    startFrame = rotPoint.index,
+                    Rotation = new Vector()
+                    {
+                        x = rotPoint.rotation.eulerAngles.x,
+                        y = rotPoint.rotation.eulerAngles.y,
+                        z = rotPoint.rotation.eulerAngles.z
+                    }
+                });
+            }
         }
 
         return modelData;

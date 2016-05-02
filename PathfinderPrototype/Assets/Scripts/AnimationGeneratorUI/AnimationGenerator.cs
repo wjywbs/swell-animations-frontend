@@ -171,6 +171,10 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AddPoint(Vector3 point)
     {
+        if(points == null)
+        {
+            points = new List<Vector3>();
+        }
         points.Add(point);
         renderLOA = true;
     }
@@ -297,11 +301,14 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
+            Debug.Log("Number of points: " + points.Count);
             ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
             points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3(v.x, v.y, v.z)));
+            Debug.Log("Number of points returned: " + points.Count);
+            Debug.Log("Number of frames: " + frames.Length);
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
@@ -333,13 +340,16 @@ public class AnimationGenerator : MonoBehaviour
 
     public void RestoreAnimation()
     {
-        if (frames == null && serializedAnimation != null && !drawingLOA && points.Count > 0)
+        if (points != null)
         {
-            ClearMaps();
-            FillModelMap(model);
-            Debug.Log("Restored using: " + serializedAnimation);
-            frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
-            Debug.Log("Restored: " + frames);
+            if (frames == null && serializedAnimation != null && !drawingLOA && points.Count > 0)
+            {
+                ClearMaps();
+                FillModelMap(model);
+                Debug.Log("Restored using: " + serializedAnimation);
+                frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
+                Debug.Log("Restored: " + frames);
+            }
         }
     }
 
