@@ -19,7 +19,10 @@ public class AnimationGenerator : MonoBehaviour
     public bool drawingLOA = false;
     public bool editingLOA = false;
     public bool addingRotationPoint = false;
+    public bool deletingRotationPoint = false;
     public int framesOfAnimation = 100;
+
+    public RotationPoint rotationPointToDelete;
 
 
     private Quaternion handleRotation = Quaternion.identity;
@@ -428,5 +431,24 @@ public class AnimationGenerator : MonoBehaviour
     public void AddEditPoint(Vector3 point)
     {
         editPoints.Add(point);
+    }
+
+    public RotationPoint getClosetestRotationPoint(Vector3 point)
+    {
+        RotationPoint closetRotPoint = rotationPoints[0];
+        float closetsDistance = Vector3.Distance(point,closetRotPoint.position);
+        if (rotationPoints != null)
+        {
+            foreach (RotationPoint rotPoint in rotationPoints)
+            {
+                float dist = Vector3.Distance(rotPoint.position, point);
+                if(dist < closetsDistance)
+                {
+                    closetsDistance = dist;
+                    closetRotPoint = rotPoint;
+                }
+            }
+        }
+        return closetRotPoint;
     }
 }
