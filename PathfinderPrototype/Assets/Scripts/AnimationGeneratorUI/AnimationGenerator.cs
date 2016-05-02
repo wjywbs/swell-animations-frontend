@@ -326,11 +326,14 @@ public class AnimationGenerator : MonoBehaviour
             position.y = n.position.y;
             position.z = n.position.z;
             t.position = position;
-            //t.eulerAngles = new Vector3(
-            //    n.eularAngles.x,
-            //    n.eularAngles.y,
-            //    n.eularAngles.z
-            //);
+            if (n.eularAngles != null)
+            {
+                t.eulerAngles = new Vector3(
+                    n.eularAngles.x,
+                    n.eularAngles.y,
+                    n.eularAngles.z
+                );
+            }
             foreach (Node child in n.children)
             {
                 SetModel(child);
