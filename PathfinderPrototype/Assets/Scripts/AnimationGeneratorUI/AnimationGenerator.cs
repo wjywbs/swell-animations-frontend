@@ -39,10 +39,10 @@ public class AnimationGenerator : MonoBehaviour
     private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
 
     [SerializeField]
-    public List<Vector3> points { get; private set; }
+    public List<Vector3> points;
 
     [SerializeField]
-    public List<RotationPoint> rotationPoints { get; private set; }
+    public List<RotationPoint> rotationPoints;
 
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();

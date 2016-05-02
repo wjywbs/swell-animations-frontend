@@ -266,7 +266,6 @@ public class AnimationGeneratorEditor : Editor
             {
                 generator.rotationPointToDelete = generator.getClosetestRotationPoint(point);
             }
-            Undo.FlushUndoRecordObjects();
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
@@ -314,7 +313,6 @@ public class AnimationGeneratorEditor : Editor
                     EditorUtility.SetDirty(generator);
                 }
             }
-            Undo.FlushUndoRecordObjects();
         }
         if (e.type == EventType.Layout && blockingMouseInputForDrawing)
         {
@@ -348,7 +346,6 @@ public class AnimationGeneratorEditor : Editor
                     Undo.RecordObject(generator, "Rotate Rotation Point");
                     EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
-                    Undo.FlushUndoRecordObjects();
                 }
             }
         }
