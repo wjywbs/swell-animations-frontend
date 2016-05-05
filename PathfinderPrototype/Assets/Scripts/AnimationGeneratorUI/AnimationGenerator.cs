@@ -298,7 +298,6 @@ public class AnimationGenerator : MonoBehaviour
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
-            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3(v.x, v.y, v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
