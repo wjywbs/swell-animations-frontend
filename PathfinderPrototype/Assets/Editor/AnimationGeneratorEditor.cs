@@ -348,6 +348,7 @@ public class AnimationGeneratorEditor : Editor
                     Undo.RecordObject(generator, "Rotate Rotation Point");
                     EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
+                    generator.GenerateAnimation();
                 }
             }
         }
