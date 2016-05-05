@@ -19,7 +19,10 @@ public class AnimationGenerator : MonoBehaviour
     public bool drawingLOA = false;
     public bool editingLOA = false;
     public bool addingRotationPoint = false;
+    public bool deletingRotationPoint = false;
     public int framesOfAnimation = 100;
+
+    public RotationPoint rotationPointToDelete;
 
 
     private Quaternion handleRotation = Quaternion.identity;
@@ -36,10 +39,10 @@ public class AnimationGenerator : MonoBehaviour
     private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
 
     [SerializeField]
-    private List<Vector3> points;
+    public List<Vector3> points;
 
     [SerializeField]
-    public List<RotationPoint> rotationPoints { get; private set; }
+    public List<RotationPoint> rotationPoints;
 
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();
@@ -103,14 +106,17 @@ public class AnimationGenerator : MonoBehaviour
 
     void DrawLine(List<Vector3> line, Color color)
     {
-        Gizmos.color = color;
-        if (line.Count > 1)
+        if (line != null)
         {
-            for (int x = 1; x < line.Count; x++)
+            Gizmos.color = color;
+            if (line.Count > 1)
             {
-                Gizmos.DrawLine(line[x - 1], line[x]);
-            }
+                for (int x = 1; x < line.Count; x++)
+                {
+                    Gizmos.DrawLine(line[x - 1], line[x]);
+                }
 
+            }
         }
     }
 
@@ -168,6 +174,10 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AddPoint(Vector3 point)
     {
+        if(points == null)
+        {
+            points = new List<Vector3>();
+        }
         points.Add(point);
         renderLOA = true;
     }
@@ -315,11 +325,14 @@ public class AnimationGenerator : MonoBehaviour
             position.y = n.position.y;
             position.z = n.position.z;
             t.position = position;
-            //t.eulerAngles = new Vector3(
-            //    n.eularAngles.x,
-            //    n.eularAngles.y,
-            //    n.eularAngles.z
-            //);
+            if (n.eularAngles != null)
+            {
+                t.eulerAngles = new Vector3(
+                    n.eularAngles.x,
+                    n.eularAngles.y,
+                    n.eularAngles.z
+                );
+            }
             foreach (Node child in n.children)
             {
                 SetModel(child);
@@ -329,13 +342,16 @@ public class AnimationGenerator : MonoBehaviour
 
     public void RestoreAnimation()
     {
-        if (frames == null && serializedAnimation != null && !drawingLOA && points.Count > 0)
+        if (points != null)
         {
-            ClearMaps();
-            FillModelMap(model);
-            Debug.Log("Restored using: " + serializedAnimation);
-            frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
-            Debug.Log("Restored: " + frames);
+            if (frames == null && serializedAnimation != null && !drawingLOA && points.Count > 0)
+            {
+                ClearMaps();
+                FillModelMap(model);
+                Debug.Log("Restored using: " + serializedAnimation);
+                frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
+                Debug.Log("Restored: " + frames);
+            }
         }
     }
 
@@ -395,16 +411,16 @@ public class AnimationGenerator : MonoBehaviour
             editStartIndex = editEndIndex;
             editEndIndex = temp;
             editPoints.Reverse();
-            List<RotationPoint> newRotPointList = new List<RotationPoint>();
-            foreach (RotationPoint rotPoint in rotationPoints)
-            {
-                if (rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
-                {
-                    newRotPointList.Add(rotPoint);
-                }
-            }
-            rotationPoints = newRotPointList;
         }
+        List<RotationPoint> newRotPointList = new List<RotationPoint>();
+        foreach (RotationPoint rotPoint in rotationPoints)
+        {
+            if (rotPoint.index < editStartIndex || rotPoint.index > editEndIndex)
+            {
+                newRotPointList.Add(rotPoint);
+            }
+        }
+        rotationPoints = newRotPointList;
         points.RemoveRange(editStartIndex, editEndIndex - editStartIndex + 1);
         points.InsertRange(editStartIndex, editPoints);
         editingLOA = false;
@@ -414,5 +430,24 @@ public class AnimationGenerator : MonoBehaviour
     public void AddEditPoint(Vector3 point)
     {
         editPoints.Add(point);
+    }
+
+    public RotationPoint getClosetestRotationPoint(Vector3 point)
+    {
+        RotationPoint closetRotPoint = rotationPoints[0];
+        float closetsDistance = Vector3.Distance(point,closetRotPoint.position);
+        if (rotationPoints != null)
+        {
+            foreach (RotationPoint rotPoint in rotationPoints)
+            {
+                float dist = Vector3.Distance(rotPoint.position, point);
+                if(dist < closetsDistance)
+                {
+                    closetsDistance = dist;
+                    closetRotPoint = rotPoint;
+                }
+            }
+        }
+        return closetRotPoint;
     }
 }

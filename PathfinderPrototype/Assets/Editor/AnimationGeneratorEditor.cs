@@ -11,9 +11,11 @@ public class AnimationGeneratorEditor : Editor
     Texture2D pauseIcon;
     Texture2D eraserIcon;
     Texture2D pencilIcon;
+    Texture2D pencilEditIcon;
     Texture2D stopIcon;
     Texture2D rotationIcon;
     Texture2D clearIcon;
+    Texture2D deleteIcon;
     Texture2D eyeIcon;
 
     bool blockingMouseInputForDrawing = false;
@@ -30,9 +32,11 @@ public class AnimationGeneratorEditor : Editor
         pauseIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pause.png", typeof(Texture2D));
         stopIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/stop.png", typeof(Texture2D));
         pencilIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil.png", typeof(Texture2D));
+        pencilEditIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil-edit.png", typeof(Texture2D));
         eraserIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eraser.png", typeof(Texture2D));
         rotationIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rotation.png", typeof(Texture2D));
         clearIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/clear-rotation.png", typeof(Texture2D));
+        deleteIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/delete-rotation.png", typeof(Texture2D));
         eyeIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eye_open.png", typeof(Texture2D));
     }
 
@@ -55,7 +59,7 @@ public class AnimationGeneratorEditor : Editor
         drawButtonContent.text = "Draw LOA";
 
         GUIContent editButtonContent = new GUIContent();
-        editButtonContent.image = pencilIcon;
+        editButtonContent.image = pencilEditIcon;
         editButtonContent.text = "Edit LOA";
 
         GUIContent clearButtonContent = new GUIContent();
@@ -65,6 +69,10 @@ public class AnimationGeneratorEditor : Editor
         GUIContent rotationButtonContent = new GUIContent();
         rotationButtonContent.image = rotationIcon;
         rotationButtonContent.text = "Add Rotation Point";
+
+        GUIContent rotationButtonDelete = new GUIContent();
+        rotationButtonDelete.image = deleteIcon;
+        rotationButtonDelete.text = "Delete Rotation Point";
 
         GUIContent rotationButtonClear = new GUIContent();
         rotationButtonClear.image = clearIcon;
@@ -107,6 +115,7 @@ public class AnimationGeneratorEditor : Editor
             generator.drawingLOA = true;
             generator.addingRotationPoint = false;
             generator.editingLOA = false;
+            generator.deletingRotationPoint = false;
             blockingMouseInputForDrawing = true;
         }
         GUILayout.FlexibleSpace();
@@ -120,6 +129,7 @@ public class AnimationGeneratorEditor : Editor
             generator.editingLOA = true;
             generator.drawingLOA = false;
             generator.addingRotationPoint = false;
+            generator.deletingRotationPoint = false;
             blockingMouseInputForDrawing = true;
         }
         GUILayout.FlexibleSpace();
@@ -129,10 +139,12 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(clearButtonContent, middleButtonStyle))
         {
+            Undo.RecordObject(generator, "Clearing LOA");
             //generator.StopAnimation();
             generator.ClearPoints();
             generator.ClearRotationPoints();
             SceneView.RepaintAll();
+            EditorUtility.SetDirty(generator);
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -154,6 +166,19 @@ public class AnimationGeneratorEditor : Editor
         if (GUILayout.Button(rotationButtonContent, middleButtonStyle))
         {
             generator.addingRotationPoint = true;
+            generator.deletingRotationPoint = false;
+            generator.editingLOA = false;
+            generator.drawingLOA = false;
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button(rotationButtonDelete, middleButtonStyle))
+        {
+            generator.deletingRotationPoint = true;
+            generator.addingRotationPoint = false;
             generator.editingLOA = false;
             generator.drawingLOA = false;
         }
@@ -164,9 +189,10 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(rotationButtonClear, middleButtonStyle))
         {
-            Debug.Log("CLEARNING.!");
+            Undo.RecordObject(generator, "Clearing Rotation Points");
             generator.ClearRotationPoints();
             SceneView.RepaintAll();
+            EditorUtility.SetDirty(generator);
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
@@ -238,6 +264,10 @@ public class AnimationGeneratorEditor : Editor
             {
                 Undo.RecordObject(generator, "Draw LOA");
             }
+            else if (generator.deletingRotationPoint)
+            {
+                generator.rotationPointToDelete = generator.getClosetestRotationPoint(point);
+            }
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
         {
@@ -275,6 +305,16 @@ public class AnimationGeneratorEditor : Editor
                 generator.GenerateAnimation();
             }
             blockingMouseInputForDrawing = false;
+            if(generator.deletingRotationPoint)
+            {
+                Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
+                if(generator.rotationPointToDelete == generator.getClosetestRotationPoint(point))
+                {
+                    Undo.RecordObject(generator, "Rotate Rotation Point");
+                    generator.rotationPoints.Remove(generator.rotationPointToDelete);
+                    EditorUtility.SetDirty(generator);
+                }
+            }
         }
         if (e.type == EventType.Layout && blockingMouseInputForDrawing)
         {
@@ -282,7 +322,7 @@ public class AnimationGeneratorEditor : Editor
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
         RotationPointHandles();
-    }
+    }    
 
     public void RotationPointHandles()
     {
@@ -305,8 +345,8 @@ public class AnimationGeneratorEditor : Editor
                 Quaternion rot = Handles.RotationHandle(rotPoint.rotation, rotPoint.position);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    Undo.RecordObject(this, "Rotate Rotation Point");
-                    EditorUtility.SetDirty(this);
+                    Undo.RecordObject(generator, "Rotate Rotation Point");
+                    EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
                 }
             }
