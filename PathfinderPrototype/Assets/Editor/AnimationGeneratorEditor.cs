@@ -12,6 +12,7 @@ public class AnimationGeneratorEditor : Editor
     Texture2D eraserIcon;
     Texture2D pencilIcon;
     Texture2D pencilEditIcon;
+    Texture2D pencilDetailIcon;
     Texture2D stopIcon;
     Texture2D rotationIcon;
     Texture2D clearIcon;
@@ -33,6 +34,7 @@ public class AnimationGeneratorEditor : Editor
         stopIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/stop.png", typeof(Texture2D));
         pencilIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil.png", typeof(Texture2D));
         pencilEditIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil-edit.png", typeof(Texture2D));
+        pencilDetailIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/pencil-detail.png", typeof(Texture2D));
         eraserIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eraser.png", typeof(Texture2D));
         rotationIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/rotation.png", typeof(Texture2D));
         clearIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/clear-rotation.png", typeof(Texture2D));
@@ -61,6 +63,10 @@ public class AnimationGeneratorEditor : Editor
         GUIContent editButtonContent = new GUIContent();
         editButtonContent.image = pencilEditIcon;
         editButtonContent.text = "Edit LOA";
+
+        GUIContent detailButtonContent = new GUIContent();
+        detailButtonContent.image = pencilDetailIcon;
+        detailButtonContent.text = "Detail LOA";
 
         GUIContent clearButtonContent = new GUIContent();
         clearButtonContent.image = eraserIcon;
@@ -126,6 +132,20 @@ public class AnimationGeneratorEditor : Editor
         if (GUILayout.Button(editButtonContent, middleButtonStyle))
         {
             //edit line            
+            generator.editingLOA = true;
+            generator.drawingLOA = false;
+            generator.addingRotationPoint = false;
+            generator.deletingRotationPoint = false;
+            blockingMouseInputForDrawing = true;
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button(detailButtonContent, middleButtonStyle))
+        {
+            //edit line
             generator.editingLOA = true;
             generator.drawingLOA = false;
             generator.addingRotationPoint = false;
