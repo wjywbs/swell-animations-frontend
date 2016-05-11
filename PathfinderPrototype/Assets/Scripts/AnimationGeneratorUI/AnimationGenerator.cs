@@ -18,9 +18,11 @@ public class AnimationGenerator : MonoBehaviour
     public float cellHeight = 32.0f;
     public bool drawingLOA = false;
     public bool editingLOA = false;
+    public bool detailingLOA = false;
     public bool addingRotationPoint = false;
     public bool deletingRotationPoint = false;
     public int framesOfAnimation = 100;
+    public int currentDetailLOA = 0;
 
     public RotationPoint rotationPointToDelete;
 
@@ -40,6 +42,9 @@ public class AnimationGenerator : MonoBehaviour
 
     [SerializeField]
     public List<Vector3> points;
+
+    [SerializeField]//FIXME: @Angel "Do I need this?" -- Carlo
+    public List<List<Vector3>> detailLoaPoints = new List<List<Vector3>>();
 
     [SerializeField]
     public List<RotationPoint> rotationPoints;
@@ -86,6 +91,7 @@ public class AnimationGenerator : MonoBehaviour
         DrawLOA();
         DrawEditLine();
         DrawRotationPoint();
+        DrawDetailLines();
     }
 
     void DrawEditLine()
@@ -101,6 +107,14 @@ public class AnimationGenerator : MonoBehaviour
         if (renderLOA)
         {
             DrawLine(points, Color.blue);
+        }
+    }
+
+    void DrawDetailLines()
+    {
+        for (int i = 0; i < detailLoaPoints.Count; ++i)
+        {
+            DrawLine(detailLoaPoints[i], Color.red);
         }
     }
 
@@ -180,6 +194,22 @@ public class AnimationGenerator : MonoBehaviour
         }
         points.Add(point);
         renderLOA = true;
+    }
+
+    public void AddDetailPoint(Vector3 point)
+    {
+        if (detailLoaPoints.Count == currentDetailLOA)
+        {
+            detailLoaPoints.Add(new List<Vector3>());
+        }
+        Debug.Assert(currentDetailLOA < detailLoaPoints.Count);
+        detailLoaPoints[currentDetailLOA].Add(point);
+    }
+
+    public void ClearDetailPoints()
+    {
+        detailLoaPoints.Clear();
+        currentDetailLOA = 0;
     }
 
     public void ClearPoints()

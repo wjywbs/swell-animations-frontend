@@ -72,6 +72,10 @@ public class AnimationGeneratorEditor : Editor
         clearButtonContent.image = eraserIcon;
         clearButtonContent.text = "Clear LOA";
 
+        GUIContent clearDetailButtonContent = new GUIContent();
+        clearDetailButtonContent.image = eraserIcon;
+        clearDetailButtonContent.text = "Clear Detail LOAs";
+
         GUIContent rotationButtonContent = new GUIContent();
         rotationButtonContent.image = rotationIcon;
         rotationButtonContent.text = "Add Rotation Point";
@@ -119,6 +123,7 @@ public class AnimationGeneratorEditor : Editor
         {
             //generator.StopAnimation();
             generator.drawingLOA = true;
+            generator.detailingLOA = false;
             generator.addingRotationPoint = false;
             generator.editingLOA = false;
             generator.deletingRotationPoint = false;
@@ -133,6 +138,7 @@ public class AnimationGeneratorEditor : Editor
         {
             //edit line            
             generator.editingLOA = true;
+            generator.detailingLOA = false;
             generator.drawingLOA = false;
             generator.addingRotationPoint = false;
             generator.deletingRotationPoint = false;
@@ -145,8 +151,9 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         if (GUILayout.Button(detailButtonContent, middleButtonStyle))
         {
-            //edit line
-            generator.editingLOA = true;
+            //detail line
+            generator.detailingLOA = true;
+            generator.editingLOA = false;
             generator.drawingLOA = false;
             generator.addingRotationPoint = false;
             generator.deletingRotationPoint = false;
@@ -163,6 +170,18 @@ public class AnimationGeneratorEditor : Editor
             //generator.StopAnimation();
             generator.ClearPoints();
             generator.ClearRotationPoints();
+            SceneView.RepaintAll();
+            EditorUtility.SetDirty(generator);
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button(clearDetailButtonContent, middleButtonStyle))
+        {
+            Undo.RecordObject(generator, "Clearing Detail LOAs");
+            generator.ClearDetailPoints();
             SceneView.RepaintAll();
             EditorUtility.SetDirty(generator);
         }
@@ -303,6 +322,11 @@ public class AnimationGeneratorEditor : Editor
                 {
                     generator.AddEditPoint(point);
                 }
+                else if (generator.detailingLOA)
+                {
+                    generator.AddDetailPoint(point);
+                    Debug.Log("Adding a point to the line.!");
+                }
                 else
                 {
                     blockingMouseInputForDrawing = false;
@@ -321,7 +345,11 @@ public class AnimationGeneratorEditor : Editor
                     Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                     generator.EditEnd(point);
                 }                     
-                EditorUtility.SetDirty(generator);
+                else if (generator.detailingLOA)
+                {
+                    generator.currentDetailLOA += 1;
+                }
+               EditorUtility.SetDirty(generator);
                 generator.GenerateAnimation();
             }
             blockingMouseInputForDrawing = false;
