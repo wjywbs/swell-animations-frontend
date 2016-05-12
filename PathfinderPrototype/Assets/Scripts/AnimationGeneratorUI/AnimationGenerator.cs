@@ -11,6 +11,7 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
+    public const int ROTATION_POINT_RANGE = 25;
 
     public int widthLines = 100;
     public int heightLines = 100;
@@ -200,6 +201,7 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
         rotationPoint.index = index;
+        rotationPoint.range = ROTATION_POINT_RANGE;
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;
@@ -307,11 +309,22 @@ public class AnimationGenerator : MonoBehaviour
             ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
-            frames = animation.frames.ToArray();
-            serializedAnimation = BackendAdapter.serializeNodeArray(frames);
-            //Debug.Log("Just serialized: " + serializedAnimation);
-            ClearMaps();
-            FillModelMap(model);
+            Debug.Log("Number of points sent: " + points.Count);
+            Debug.Log("Number of frames requested: " + framesOfAnimation);
+            Debug.Log("Number of points in generated spline: " + animation.spline.Count);
+            Debug.Log("Number of frames in generated animation: " + animation.frames.Count);
+            if (animation.hasError)
+            {
+                Debug.LogError("An Error has occured, error message: " + animation.errorMessage);
+            }
+            else
+            {
+                frames = animation.frames.ToArray();
+                serializedAnimation = BackendAdapter.serializeNodeArray(frames);
+                //Debug.Log("Just serialized: " + serializedAnimation);
+                ClearMaps();
+                FillModelMap(model);
+            }
         }
     }
 
