@@ -11,6 +11,7 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
+    public const float LOOK_AT_MODIFIER = 5;
 
     public int widthLines = 100;
     public int heightLines = 100;
@@ -174,7 +175,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AddPoint(Vector3 point)
     {
-        if(points == null)
+        if (points == null)
         {
             points = new List<Vector3>();
         }
@@ -330,11 +331,11 @@ public class AnimationGenerator : MonoBehaviour
             {
                 //The backend is not really returning the Euler angles, but instad a position that we must look at.
                 Vector3 lookAt = new Vector3(
-                    n.eularAngles.x,
-                    n.eularAngles.y,
-                    n.eularAngles.z
-                );
-                t.LookAt(lookAt);
+                                     n.eularAngles.x,
+                                     n.eularAngles.y,
+                                     n.eularAngles.z
+                                 );
+                t.LookAt(lookAt * LOOK_AT_MODIFIER);
             }
             foreach (Node child in n.children)
             {
@@ -367,9 +368,13 @@ public class AnimationGenerator : MonoBehaviour
                 n.position.x,
                 n.position.y,
                 n.position.z);
-            SetModel(n);
-            //AnimationData.PrintAllNodes(node,"-");
-            //AnimationData.PrintAllTransforms(model, "-");
+            Vector3 lookAt = new Vector3(
+                                 n.eularAngles.x,
+                                 n.eularAngles.y,
+                                 n.eularAngles.z
+                             );
+            model.LookAt(lookAt * LOOK_AT_MODIFIER);
+            SetModel(frames[currentFrame]);
         }
     }
 
@@ -438,13 +443,13 @@ public class AnimationGenerator : MonoBehaviour
     public RotationPoint getClosetestRotationPoint(Vector3 point)
     {
         RotationPoint closetRotPoint = rotationPoints[0];
-        float closetsDistance = Vector3.Distance(point,closetRotPoint.position);
+        float closetsDistance = Vector3.Distance(point, closetRotPoint.position);
         if (rotationPoints != null)
         {
             foreach (RotationPoint rotPoint in rotationPoints)
             {
                 float dist = Vector3.Distance(rotPoint.position, point);
-                if(dist < closetsDistance)
+                if (dist < closetsDistance)
                 {
                     closetsDistance = dist;
                     closetRotPoint = rotPoint;

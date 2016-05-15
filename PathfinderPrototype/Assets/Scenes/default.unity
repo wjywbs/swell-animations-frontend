@@ -287,11 +287,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 11434456, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: points.Array.size
-      value: 998
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11434456, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: rotationPoints.Array.size
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 470036, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: m_LocalPosition.x
@@ -6283,7 +6283,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11434456, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: framesOfAnimation
-      value: 1000
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11434456, guid: 41d6062365df66c40ba75a9393b6d792, type: 2}
       propertyPath: currentFrame
