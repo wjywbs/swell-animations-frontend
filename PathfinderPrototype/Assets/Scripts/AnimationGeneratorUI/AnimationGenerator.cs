@@ -357,11 +357,13 @@ public class AnimationGenerator : MonoBehaviour
             t.position = position;
             if (n.eularAngles != null)
             {
-                t.eulerAngles = new Vector3(
+                //The backend is not really returning the Euler angles, but instad a position that we must look at.
+                Vector3 lookAt = new Vector3(
                     n.eularAngles.x,
                     n.eularAngles.y,
                     n.eularAngles.z
                 );
+                t.LookAt(lookAt);
             }
             foreach (Node child in n.children)
             {
