@@ -11,7 +11,7 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
-    public const float LOOK_AT_MODIFIER = 5;
+    public const float LOOK_AT_MODIFIER = 1;
 
     public int widthLines = 100;
     public int heightLines = 100;
@@ -87,6 +87,24 @@ public class AnimationGenerator : MonoBehaviour
         DrawLOA();
         DrawEditLine();
         DrawRotationPoint();
+        DrawPrimes();
+    }
+
+    void DrawPrimes()
+    {
+        if (frames == null || currentFrame >= frames.Length)
+            return;
+        Node frame = frames[currentFrame];
+        while(frame.children.Count >0 )
+        {
+            Gizmos.DrawSphere(new Vector3()
+            {
+                x = frame.eularAngles.x,
+                y = frame.eularAngles.y,
+                z = frame.eularAngles.z
+            }, 1);
+            frame = frame.children[0];
+        }
     }
 
     void DrawEditLine()
