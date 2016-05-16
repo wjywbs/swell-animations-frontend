@@ -11,7 +11,7 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
-    public const float LOOK_AT_MODIFIER = 1;
+    public const float LOOK_AT_MODIFIER = -3;
 
     public int widthLines = 100;
     public int heightLines = 100;
@@ -87,7 +87,7 @@ public class AnimationGenerator : MonoBehaviour
         DrawLOA();
         DrawEditLine();
         DrawRotationPoint();
-        DrawPrimes();
+        //DrawPrimes();
     }
 
     void DrawPrimes()
@@ -97,12 +97,19 @@ public class AnimationGenerator : MonoBehaviour
         Node frame = frames[currentFrame];
         while(frame.children.Count >0 )
         {
-            Gizmos.DrawSphere(new Vector3()
+            Vector3 tangent = new Vector3(
+                                     frame.eularAngles.x,
+                                     frame.eularAngles.y,
+                                     frame.eularAngles.z
+                                 ) * LOOK_AT_MODIFIER;
+
+            Vector3 position = new Vector3()
             {
-                x = frame.eularAngles.x,
-                y = frame.eularAngles.y,
-                z = frame.eularAngles.z
-            }, 1);
+                x = frame.position.x,
+                y = frame.position.y,
+                z = frame.position.z
+            };
+            Gizmos.DrawSphere(tangent + position, 1);
             frame = frame.children[0];
         }
     }
@@ -352,8 +359,8 @@ public class AnimationGenerator : MonoBehaviour
                                      n.eularAngles.x,
                                      n.eularAngles.y,
                                      n.eularAngles.z
-                                 );
-                t.LookAt(lookAt * LOOK_AT_MODIFIER);
+                                 ) * LOOK_AT_MODIFIER;
+                t.LookAt(lookAt + position);
             }
             foreach (Node child in n.children)
             {
