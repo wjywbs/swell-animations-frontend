@@ -98,16 +98,16 @@ public class AnimationGenerator : MonoBehaviour
         while(frame.children.Count >0 )
         {
             Vector3 tangent = new Vector3(
-                                     frame.eularAngles.x,
-                                     frame.eularAngles.y,
-                                     frame.eularAngles.z
+                                     (float) frame.eularAngles.x,
+                                     (float) frame.eularAngles.y,
+                                     (float) frame.eularAngles.z
                                  ) * LOOK_AT_MODIFIER;
 
             Vector3 position = new Vector3()
             {
-                x = frame.position.x,
-                y = frame.position.y,
-                z = frame.position.z
+                x = (float) frame.position.x,
+                y = (float) frame.position.y,
+                z = (float) frame.position.z
             };
             Gizmos.DrawSphere(tangent + position, 1);
             frame = frame.children[0];
@@ -334,7 +334,7 @@ public class AnimationGenerator : MonoBehaviour
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
-            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3(v.x, v.y, v.z)));
+            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float) v.x, (float) v.y, (float) v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
@@ -348,19 +348,19 @@ public class AnimationGenerator : MonoBehaviour
         {
             Transform t = modelMap[n.name];
             Vector3 position = new Vector3();
-            position.x = n.position.x;
-            position.y = n.position.y;
-            position.z = n.position.z;
+            position.x = (float) n.position.x;
+            position.y = (float) n.position.y;
+            position.z = (float) n.position.z;
             t.position = position;
             if (n.eularAngles != null)
             {
                 //The backend is not really returning the Euler angles, but instad a position that we must look at.
-                Vector3 lookAt = new Vector3(
-                                     n.eularAngles.x,
-                                     n.eularAngles.y,
-                                     n.eularAngles.z
+                Vector3 eulerAngles = new Vector3(
+                                     (float) n.eularAngles.x,
+                                     (float) n.eularAngles.y,
+                                     (float) n.eularAngles.z
                                  ) * LOOK_AT_MODIFIER;
-                t.LookAt(lookAt + position);
+                t.eulerAngles = eulerAngles;
             }
             foreach (Node child in n.children)
             {
@@ -390,13 +390,13 @@ public class AnimationGenerator : MonoBehaviour
         {
             Node n = frames[currentFrame];
             model.position = new Vector3(
-                n.position.x,
-                n.position.y,
-                n.position.z);
+                (float) n.position.x,
+                (float) n.position.y,
+                (float) n.position.z);
             Vector3 lookAt = new Vector3(
-                                 n.eularAngles.x,
-                                 n.eularAngles.y,
-                                 n.eularAngles.z
+                                 (float) n.eularAngles.x,
+                                 (float) n.eularAngles.y,
+                                 (float) n.eularAngles.z
                              );
             model.LookAt(lookAt * LOOK_AT_MODIFIER);
             SetModel(frames[currentFrame]);
