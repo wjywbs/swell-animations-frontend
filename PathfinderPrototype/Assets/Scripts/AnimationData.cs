@@ -106,7 +106,7 @@ public class AnimationData
         return parent;
     }
 
-    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints)
+    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints, List<List<Vector3>> detailLoaPoints)
     {
         ModelData modelData = new ModelData();
         modelData.model = GenerateNode(model);
@@ -119,6 +119,24 @@ public class AnimationData
                 y = point.y,
                 z = point.z
             });
+        }
+        foreach(List<Vector3> layer in detailLoaPoints)
+        {
+			AnimationLayer animationLayer = new AnimationLayer()
+			{
+				numFrames = 10,
+				startFrame = 10
+			};
+            foreach(Vector3 point in layer)
+            {
+				animationLayer.Add(new Vector()
+                {
+                    x = point.x,
+                    y = point.y,
+                    z = point.z
+                });
+            }
+			modelData.animationLayers.Add (animationLayer);
         }
         if (rotationPoints != null)
         {

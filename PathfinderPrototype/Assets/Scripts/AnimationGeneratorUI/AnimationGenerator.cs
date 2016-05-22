@@ -360,7 +360,7 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
+            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints, detailLoaPoints);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
