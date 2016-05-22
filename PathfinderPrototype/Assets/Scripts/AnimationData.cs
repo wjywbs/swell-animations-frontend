@@ -129,7 +129,7 @@ public class AnimationData
 			};
             foreach(Vector3 point in layer)
             {
-				animationLayer.Add(new Vector()
+				animationLayer.layerPoints.Add(new Vector()
                 {
                     x = point.x,
                     y = point.y,
