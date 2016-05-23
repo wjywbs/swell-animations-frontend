@@ -124,7 +124,7 @@ public class AnimationData
         {
 			// Find closest index
 			int index;
-			FindClosestIntersect.Search (controlPoints, layer [layer.length / 2], index);
+			FindClosestIntersect.Search (controlPoints, layer [layer.Count / 2], index);
 			AnimationLayer animationLayer = new AnimationLayer()
 			{
 				numFrames = 10,
