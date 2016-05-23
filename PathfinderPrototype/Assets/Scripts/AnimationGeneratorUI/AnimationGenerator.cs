@@ -11,12 +11,12 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
-    public const float LOOK_AT_MODIFIER = -3;
+    public const float LOOK_AT_MODIFIER = -1;
 
-    public int widthLines = 100;
-    public int heightLines = 100;
-    public float cellWidth = 32.0f;
-    public float cellHeight = 32.0f;
+    public int widthLines = 10000;
+    public int heightLines = 10000;
+    public float cellWidth = 3200.0f;
+    public float cellHeight = 3200.0f;
     public bool drawingLOA = false;
     public bool editingLOA = false;
     public bool detailingLOA = false;
@@ -94,6 +94,33 @@ public class AnimationGenerator : MonoBehaviour
         DrawRotationPoint();
         DrawDetailLines();
         //DrawPrimes();
+        //DrawVectors(model);
+        DrawPlaneVectors();
+    }
+
+    void DrawVectors(Transform trans)
+    {
+        foreach (Transform t in trans)
+        {
+            if (t.name.Contains("spine"))
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawRay(t.position, t.forward * 5);
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(t.position, t.up * 5);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(t.position, (t.up + t.forward).normalized * 5);
+            }
+            DrawVectors(t);
+        }
+    }
+
+    void DrawPlaneVectors()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(planeVector1, planeVector1 * 5);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawRay(planeVector2, planeVector2 * 5);
     }
 
     void DrawPrimes()
@@ -101,21 +128,24 @@ public class AnimationGenerator : MonoBehaviour
         if (frames == null || currentFrame >= frames.Length)
             return;
         Node frame = frames[currentFrame];
-        while(frame.children.Count >0 )
+        System.Random rand = new System.Random();
+        while (frame.children.Count > 0)
         {
             Vector3 tangent = new Vector3(
-                                     (float) frame.eularAngles.x,
-                                     (float) frame.eularAngles.y,
-                                     (float) frame.eularAngles.z
+                                     (float)frame.eularAngles.x,
+                                     (float)frame.eularAngles.y,
+                                     (float)frame.eularAngles.z
                                  ) * LOOK_AT_MODIFIER;
 
             Vector3 position = new Vector3()
             {
-                x = (float) frame.position.x,
-                y = (float) frame.position.y,
-                z = (float) frame.position.z
+                x = (float)frame.position.x,
+                y = (float)frame.position.y,
+                z = (float)frame.position.z
             };
-            Gizmos.DrawSphere(tangent + position, 1);
+            Gizmos.color = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+            Gizmos.DrawSphere(tangent + position, .1f);
+            Gizmos.DrawSphere(position, .1f);
             frame = frame.children[0];
         }
     }
@@ -364,7 +394,7 @@ public class AnimationGenerator : MonoBehaviour
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
-            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float) v.x, (float) v.y, (float) v.z)));
+            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float)v.x, (float)v.y, (float)v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
@@ -377,25 +407,30 @@ public class AnimationGenerator : MonoBehaviour
         if (modelMap.ContainsKey(n.name))
         {
             Transform t = modelMap[n.name];
-            Vector3 position = new Vector3();
-            position.x = (float) n.position.x;
-            position.y = (float) n.position.y;
-            position.z = (float) n.position.z;
-            t.position = position;
-            if (n.eularAngles != null)
-            {
-                //The backend is not really returning the Euler angles, but instad a position that we must look at.
-                Vector3 eulerAngles = new Vector3(
-                                     (float) n.eularAngles.x,
-                                     (float) n.eularAngles.y,
-                                     (float) n.eularAngles.z
-                                 ) * LOOK_AT_MODIFIER;
-                t.eulerAngles = eulerAngles;
-            }
+            SetNodePose(n, t, true);
             foreach (Node child in n.children)
             {
                 SetModel(child);
             }
+        }
+    }
+
+    public void SetNodePose(Node n, Transform t, Boolean check)
+    {
+        Vector3 position = new Vector3();
+        position.x = (float)n.position.x;
+        position.y = (float)n.position.y;
+        position.z = (float)n.position.z;
+        t.position = position;
+        if (n.eularAngles != null)
+        {
+            //The backend is not really returning the Euler angles, but instad a position that we must look at.
+            Vector3 eulerAngles = new Vector3(
+                                 (float)n.eularAngles.x,
+                                 (float)n.eularAngles.y,
+                                 (float)n.eularAngles.z
+                             ) * LOOK_AT_MODIFIER;
+            t.LookAt(eulerAngles + position, -planeVector1);
         }
     }
 
@@ -419,16 +454,7 @@ public class AnimationGenerator : MonoBehaviour
         if (currentFrame < frames.Length)
         {
             Node n = frames[currentFrame];
-            model.position = new Vector3(
-                (float) n.position.x,
-                (float) n.position.y,
-                (float) n.position.z);
-            Vector3 lookAt = new Vector3(
-                                 (float) n.eularAngles.x,
-                                 (float) n.eularAngles.y,
-                                 (float) n.eularAngles.z
-                             );
-            model.LookAt(lookAt * LOOK_AT_MODIFIER);
+            SetNodePose(n, model, false);
             SetModel(frames[currentFrame]);
         }
     }
