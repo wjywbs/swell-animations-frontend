@@ -363,11 +363,14 @@ public class AnimationGenerator : MonoBehaviour
             beginRotation = model.rotation;
             currentFrame = 0;
             ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
+
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
-            frames = animation.frames.ToArray();pois = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float) v.x, (float) v.y, (float) v.z)));
-            serializedAnimation = BackendAdapter.serializeNodeArray(frames);            
-	    ClearMaps();
+            frames = animation.frames.ToArray();
+            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float)v.x, (float)v.y, (float)v.z)));
+            serializedAnimation = BackendAdapter.serializeNodeArray(frames);
+            //Debug.Log("Just serialized: " + serializedAnimation);
+            ClearMaps();
             FillModelMap(model);
         }
     }

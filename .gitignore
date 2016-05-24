@@ -14,3 +14,4 @@ PathfinderPrototype/.vs/
 *.pdb
 ProjectVersion.txt
 *.orig
+*.orig*
