@@ -256,6 +256,7 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
 
+
         GUILayout.BeginHorizontal();
         GUILayout.Label("Frames of Animation");
         generator.framesOfAnimation = (int)CustomGUILayout.FloatField((float)generator.framesOfAnimation);

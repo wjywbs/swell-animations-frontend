@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -rf PathfinderPrototype/Assets/UnityTestTools*
+rm PathfinderPrototype/Assets/Scripts/CurvesAndSplinesTest.cs*
+rm PathfinderPrototype/Assets/Editor/CurvesAndSplinesTestEditor.cs*
+rm -rf PathfinderPrototype/Assets/Editor/Test*
+ln -s ~/swell-animations-algorithm/bin/swell-animations.so PathfinderPrototype/Assets/Plugins/swell-animations.so
