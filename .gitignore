@@ -13,3 +13,4 @@ PathfinderPrototype/.vs/
 *.lib
 *.pdb
 ProjectVersion.txt
+*.orig

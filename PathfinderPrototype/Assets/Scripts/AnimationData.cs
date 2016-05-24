@@ -53,9 +53,20 @@ public class AnimationData
 
     public static Node GenerateNode(Transform model)
     {
-        Node node = CreateNodeFromGameObject(model);
-        GenerateChildren(model, node);
-        return node;
+        return GenerateChildren(model, null, 1);
+    }
+
+    public static Transform FindChild(string name, Transform t)
+    {
+        if (t.name == name)
+            return t;
+        foreach (Transform child in t)
+        {
+            Transform ct = FindChild(name, child);
+            if (ct != null)
+                return ct;
+        }
+        return null;
     }
 
     public static Node CreateNodeFromGameObject(Transform transform)
@@ -80,22 +91,20 @@ public class AnimationData
         };
     }
 
-    public static void GenerateChildren(Transform children, Node parent)
+    public static Node GenerateChildren(Transform model, Node parent, int x)
     {
-        foreach (Transform transform in children)
+        Transform nextSpine = FindChild("spine" + x, model);
+        if(nextSpine != null)
         {
-            Node child;
-            //For now we are only sending the spine this will change later
-            if (transform.gameObject.name.Contains("spine"))
+            Node child = CreateNodeFromGameObject(nextSpine);
+            if (x > 1)
             {
-                child = CreateNodeFromGameObject(transform);
                 parent.children.Add(child);
-            } else
-            {
-                child = parent;
             }
-            GenerateChildren(transform, child);
+            parent = child;
+            GenerateChildren(model, parent, ++x);
         }
+        return parent;
     }
 
     public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints)

@@ -11,6 +11,7 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
+    public const float LOOK_AT_MODIFIER = -3;
     public const int ROTATION_POINT_RANGE = 25;
 
     public int widthLines = 100;
@@ -19,9 +20,11 @@ public class AnimationGenerator : MonoBehaviour
     public float cellHeight = 32.0f;
     public bool drawingLOA = false;
     public bool editingLOA = false;
+    public bool detailingLOA = false;
     public bool addingRotationPoint = false;
     public bool deletingRotationPoint = false;
     public int framesOfAnimation = 100;
+    public int currentDetailLOA = 0;
 
     public RotationPoint rotationPointToDelete;
 
@@ -41,6 +44,9 @@ public class AnimationGenerator : MonoBehaviour
 
     [SerializeField]
     public List<Vector3> points;
+
+    [SerializeField]//FIXME: @Angel "Do I need this?" -- Carlo
+    public List<List<Vector3>> detailLoaPoints = new List<List<Vector3>>();
 
     [SerializeField]
     public List<RotationPoint> rotationPoints;
@@ -87,6 +93,32 @@ public class AnimationGenerator : MonoBehaviour
         DrawLOA();
         DrawEditLine();
         DrawRotationPoint();
+        DrawDetailLines();
+        //DrawPrimes();
+    }
+
+    void DrawPrimes()
+    {
+        if (frames == null || currentFrame >= frames.Length)
+            return;
+        Node frame = frames[currentFrame];
+        while(frame.children.Count >0 )
+        {
+            Vector3 tangent = new Vector3(
+                                     (float) frame.eularAngles.x,
+                                     (float) frame.eularAngles.y,
+                                     (float) frame.eularAngles.z
+                                 ) * LOOK_AT_MODIFIER;
+
+            Vector3 position = new Vector3()
+            {
+                x = (float) frame.position.x,
+                y = (float) frame.position.y,
+                z = (float) frame.position.z
+            };
+            Gizmos.DrawSphere(tangent + position, 1);
+            frame = frame.children[0];
+        }
     }
 
     void DrawEditLine()
@@ -102,6 +134,14 @@ public class AnimationGenerator : MonoBehaviour
         if (renderLOA)
         {
             DrawLine(points, Color.blue);
+        }
+    }
+
+    void DrawDetailLines()
+    {
+        for (int i = 0; i < detailLoaPoints.Count; ++i)
+        {
+            DrawLine(detailLoaPoints[i], Color.red);
         }
     }
 
@@ -175,12 +215,28 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AddPoint(Vector3 point)
     {
-        if(points == null)
+        if (points == null)
         {
             points = new List<Vector3>();
         }
         points.Add(point);
         renderLOA = true;
+    }
+
+    public void AddDetailPoint(Vector3 point)
+    {
+        if (detailLoaPoints.Count == currentDetailLOA)
+        {
+            detailLoaPoints.Add(new List<Vector3>());
+        }
+        Debug.Assert(currentDetailLOA < detailLoaPoints.Count);
+        detailLoaPoints[currentDetailLOA].Add(point);
+    }
+
+    public void ClearDetailPoints()
+    {
+        detailLoaPoints.Clear();
+        currentDetailLOA = 0;
     }
 
     public void ClearPoints()
@@ -309,22 +365,10 @@ public class AnimationGenerator : MonoBehaviour
             ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
-            Debug.Log("Number of points sent: " + points.Count);
-            Debug.Log("Number of frames requested: " + framesOfAnimation);
-            Debug.Log("Number of points in generated spline: " + animation.spline.Count);
-            Debug.Log("Number of frames in generated animation: " + animation.frames.Count);
-            if (animation.hasError)
-            {
-                Debug.LogError("An Error has occured, error message: " + animation.errorMessage);
-            }
-            else
-            {
-                frames = animation.frames.ToArray();
-                serializedAnimation = BackendAdapter.serializeNodeArray(frames);
-                //Debug.Log("Just serialized: " + serializedAnimation);
-                ClearMaps();
-                FillModelMap(model);
-            }
+            frames = animation.frames.ToArray();pois = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float) v.x, (float) v.y, (float) v.z)));
+            serializedAnimation = BackendAdapter.serializeNodeArray(frames);            
+	    ClearMaps();
+            FillModelMap(model);
         }
     }
 
@@ -334,17 +378,19 @@ public class AnimationGenerator : MonoBehaviour
         {
             Transform t = modelMap[n.name];
             Vector3 position = new Vector3();
-            position.x = n.position.x;
-            position.y = n.position.y;
-            position.z = n.position.z;
+            position.x = (float) n.position.x;
+            position.y = (float) n.position.y;
+            position.z = (float) n.position.z;
             t.position = position;
             if (n.eularAngles != null)
             {
-                t.eulerAngles = new Vector3(
-                    n.eularAngles.x,
-                    n.eularAngles.y,
-                    n.eularAngles.z
-                );
+                //The backend is not really returning the Euler angles, but instad a position that we must look at.
+                Vector3 eulerAngles = new Vector3(
+                                     (float) n.eularAngles.x,
+                                     (float) n.eularAngles.y,
+                                     (float) n.eularAngles.z
+                                 ) * LOOK_AT_MODIFIER;
+                t.eulerAngles = eulerAngles;
             }
             foreach (Node child in n.children)
             {
@@ -374,12 +420,16 @@ public class AnimationGenerator : MonoBehaviour
         {
             Node n = frames[currentFrame];
             model.position = new Vector3(
-                n.position.x,
-                n.position.y,
-                n.position.z);
-            SetModel(n);
-            //AnimationData.PrintAllNodes(node,"-");
-            //AnimationData.PrintAllTransforms(model, "-");
+                (float) n.position.x,
+                (float) n.position.y,
+                (float) n.position.z);
+            Vector3 lookAt = new Vector3(
+                                 (float) n.eularAngles.x,
+                                 (float) n.eularAngles.y,
+                                 (float) n.eularAngles.z
+                             );
+            model.LookAt(lookAt * LOOK_AT_MODIFIER);
+            SetModel(frames[currentFrame]);
         }
     }
 
@@ -448,13 +498,13 @@ public class AnimationGenerator : MonoBehaviour
     public RotationPoint getClosetestRotationPoint(Vector3 point)
     {
         RotationPoint closetRotPoint = rotationPoints[0];
-        float closetsDistance = Vector3.Distance(point,closetRotPoint.position);
+        float closetsDistance = Vector3.Distance(point, closetRotPoint.position);
         if (rotationPoints != null)
         {
             foreach (RotationPoint rotPoint in rotationPoints)
             {
                 float dist = Vector3.Distance(rotPoint.position, point);
-                if(dist < closetsDistance)
+                if (dist < closetsDistance)
                 {
                     closetsDistance = dist;
                     closetRotPoint = rotPoint;
