@@ -12,6 +12,7 @@ public class AnimationGenerator : MonoBehaviour
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
     public const float LOOK_AT_MODIFIER = -1;
+    public const int ROTATION_POINT_RANGE = 25;
 
     public int widthLines = 10000;
     public int heightLines = 10000;
@@ -286,6 +287,7 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
         rotationPoint.index = index;
+        rotationPoint.range = ROTATION_POINT_RANGE;
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;

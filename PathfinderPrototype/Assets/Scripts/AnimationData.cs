@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using swellanimations;
@@ -144,8 +145,8 @@ public class AnimationData
             {
                 modelData.rotationpoints.Add(new swellanimations.RotationPoint()
                 {
-                    numFrames = 10,
-                    startFrame = rotPoint.index,
+                    numFrames = Math.Min(rotPoint.range, rotPoint.index + 1),
+                    startFrame = Math.Max(rotPoint.index - rotPoint.range, 0),
                     Rotation = new Vector()
                     {
                         x = rotPoint.rotation.eulerAngles.x,
