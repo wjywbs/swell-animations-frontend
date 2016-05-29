@@ -11,7 +11,6 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
-    public const float LOOK_AT_MODIFIER = -1;
 
     public int rotationPointRange = 25;
 
@@ -55,6 +54,7 @@ public class AnimationGenerator : MonoBehaviour
     public Vector3 planeOrigin = new Vector3();
     public Vector3 planeVector1 = new Vector3();
     public Vector3 planeVector2 = new Vector3();
+    public Vector3 upVector = new Vector3();
 
     [SerializeField]
     public Transform planePoint1;
@@ -137,7 +137,7 @@ public class AnimationGenerator : MonoBehaviour
                                      (float)frame.eularAngles.x,
                                      (float)frame.eularAngles.y,
                                      (float)frame.eularAngles.z
-                                 ) * LOOK_AT_MODIFIER;
+                                 );
 
             Vector3 position = new Vector3()
             {
@@ -331,6 +331,7 @@ public class AnimationGenerator : MonoBehaviour
     {
         currentFrame = 0;
         animationPlaying = false;
+        upVector = -planeVector1;
         RestoreToOriginal(model);
     }
 
@@ -431,8 +432,8 @@ public class AnimationGenerator : MonoBehaviour
                                  (float)n.eularAngles.x,
                                  (float)n.eularAngles.y,
                                  (float)n.eularAngles.z
-                             ) * LOOK_AT_MODIFIER;
-            t.LookAt(eulerAngles + position, -planeVector1);
+                             );
+            t.LookAt(eulerAngles + position, upVector);
         }
     }
 
@@ -456,12 +457,12 @@ public class AnimationGenerator : MonoBehaviour
         if (currentFrame < frames.Length)
         {
             Node n = frames[currentFrame];
-            SetNodePose(n, model, false);
-            SetModel(frames[currentFrame]);
             if (n.rotation != null)
             {
-                model.Rotate(new Vector3((float)n.rotation.x, (float)n.rotation.y, (float)n.rotation.z));
-            }
+                upVector = Quaternion.Euler(new Vector3((float)n.rotation.x, (float)n.rotation.y, (float)n.rotation.z)) * upVector;
+            } 
+            SetNodePose(n, model, false);
+            SetModel(frames[currentFrame]);
         }
     }
 
