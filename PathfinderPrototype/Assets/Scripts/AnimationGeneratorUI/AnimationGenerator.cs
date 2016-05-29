@@ -12,7 +12,8 @@ public class AnimationGenerator : MonoBehaviour
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
     public const float LOOK_AT_MODIFIER = -1;
-    public const int ROTATION_POINT_RANGE = 25;
+
+    public int rotationPointRange = 25;
 
     public int widthLines = 10000;
     public int heightLines = 10000;
@@ -287,7 +288,7 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
         rotationPoint.index = index;
-        rotationPoint.range = ROTATION_POINT_RANGE;
+        rotationPoint.range = rotationPointRange;
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;
@@ -349,7 +350,7 @@ public class AnimationGenerator : MonoBehaviour
         {
             if (timeSinceLastFrame >= timeBetweenFrames)
             {
-                if (currentFrame < points.Count)
+                if (currentFrame < frames.Length)
                 {
                     currentFrame++;
                     AnimateFrame();
@@ -396,7 +397,6 @@ public class AnimationGenerator : MonoBehaviour
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
-            points = animation.spline.ConvertAll(new Converter<Vector, Vector3>(v => new Vector3((float)v.x, (float)v.y, (float)v.z)));
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
@@ -458,6 +458,10 @@ public class AnimationGenerator : MonoBehaviour
             Node n = frames[currentFrame];
             SetNodePose(n, model, false);
             SetModel(frames[currentFrame]);
+            if (n.rotation != null)
+            {
+                model.Rotate(new Vector3((float)n.rotation.x, (float)n.rotation.y, (float)n.rotation.z));
+            }
         }
     }
 

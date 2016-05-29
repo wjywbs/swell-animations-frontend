@@ -263,9 +263,13 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-
         GUILayout.Label("Max Frame Rate");
         generator.timeBetweenFrames = 1 / CustomGUILayout.FloatField(generator.GetFrameRate());
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Rotation Point Range");
+        generator.rotationPointRange = (int)CustomGUILayout.FloatField((float)generator.rotationPointRange);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
@@ -292,12 +296,14 @@ public class AnimationGeneratorEditor : Editor
             if (generator.addingRotationPoint)
             {
                 Undo.RecordObject(generator, "Add Rotation Point");
+                generator.StopAnimation();
                 generator.AddRotationPoint(point);
                 EditorUtility.SetDirty(generator);
             }
             else if (generator.editingLOA)
             {
                 Undo.RecordObject(generator, "Edit LOA");
+                generator.StopAnimation();
                 generator.EditStart(point);
             }
             else if (generator.drawingLOA)
@@ -307,6 +313,7 @@ public class AnimationGeneratorEditor : Editor
             else if (generator.deletingRotationPoint)
             {
                 generator.rotationPointToDelete = generator.getClosetestRotationPoint(point);
+                generator.StopAnimation();
             }
         }
         else if (e.type == EventType.MouseDrag && e.mousePosition != lastPoint)
@@ -362,6 +369,7 @@ public class AnimationGeneratorEditor : Editor
                     Undo.RecordObject(generator, "Rotate Rotation Point");
                     generator.rotationPoints.Remove(generator.rotationPointToDelete);
                     EditorUtility.SetDirty(generator);
+                    generator.StopAnimation();
                     generator.GenerateAnimation();
                 }
             }
@@ -398,6 +406,7 @@ public class AnimationGeneratorEditor : Editor
                     Undo.RecordObject(generator, "Rotate Rotation Point");
                     EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
+                    generator.StopAnimation();
                     generator.GenerateAnimation();
                 }
             }

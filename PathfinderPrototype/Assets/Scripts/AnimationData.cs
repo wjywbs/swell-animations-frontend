@@ -146,17 +146,18 @@ public class AnimationData
         {
             foreach (RotationPoint rotPoint in rotationPoints)
             {
-                modelData.rotationpoints.Add(new swellanimations.RotationPoint()
+                swellanimations.RotationPoint nrp = new swellanimations.RotationPoint()
                 {
-                    numFrames = Math.Min(rotPoint.range, rotPoint.index + 1),
-                    startFrame = Math.Max(rotPoint.index - rotPoint.range, 0),
                     Rotation = new Vector()
                     {
                         x = rotPoint.rotation.eulerAngles.x,
                         y = rotPoint.rotation.eulerAngles.y,
                         z = rotPoint.rotation.eulerAngles.z
                     }
-                });
+                };
+                nrp.numFrames = Math.Min(rotPoint.range, rotPoint.index + 1);
+                nrp.startFrame = Math.Max(rotPoint.index - rotPoint.range, 0);
+                modelData.rotationpoints.Add(nrp);
             }
         }
 
