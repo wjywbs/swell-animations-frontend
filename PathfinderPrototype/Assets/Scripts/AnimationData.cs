@@ -123,10 +123,13 @@ public class AnimationData
         }
         foreach(List<Vector3> layer in detailLoaPoints)
         {
+			// Find closest index
+			int index;
+			FindClosestIntersect.Search (controlPoints, layer [layer.Count / 2], out index);
 			AnimationLayer animationLayer = new AnimationLayer()
 			{
 				numFrames = 10,
-				startFrame = 10
+				startFrame = index
 			};
             foreach(Vector3 point in layer)
             {
