@@ -13,6 +13,7 @@ public class AnimationGenerator : MonoBehaviour
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
     public const string FILE_LINE_SEPARATOR = "swellanimationsisthebesteverlonglivebun";
+    public const float SPINE_PROPORTION_FUDGE_FACTOR = 0.5f;
 
     public int mutatorStrength = 25;
     public bool forceRestore = false;
@@ -44,6 +45,10 @@ public class AnimationGenerator : MonoBehaviour
     private Dictionary<string, Transform> modelMap = new Dictionary<string, Transform>();
     private Dictionary<Transform, Vector3> originalPositionMap = new Dictionary<Transform, Vector3>();
     private Dictionary<Transform, Quaternion> originalRotationMap = new Dictionary<Transform, Quaternion>();
+
+    public Dictionary<Transform, float> spineProportions = new Dictionary<Transform, float>();
+    public float perFrameDistance;
+    public float splineLength;
 
     [SerializeField]
     public List<Vector3> points;
@@ -350,11 +355,11 @@ public class AnimationGenerator : MonoBehaviour
 
     public void UpdateAnimation(float deltaTime)
     {
-        if (animationPlaying)
+        if (animationPlaying && frames != null)
         {
             if (timeSinceLastFrame >= timeBetweenFrames)
             {
-                if (currentFrame < frames.Length)
+                if (currentFrame < framesOfAnimation)
                 {
                     currentFrame++;
                     AnimateFrame();
@@ -397,7 +402,7 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints, detailLoaPoints, mutatorStrength);
+            ModelData modelData = AnimationData.CreateModelData(model, GenerateSpline(), rotationPoints, detailLoaPoints, mutatorStrength);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
@@ -405,6 +410,7 @@ public class AnimationGenerator : MonoBehaviour
             //Debug.Log("Just serialized: " + serializedAnimation);
             ClearMaps();
             FillModelMap(model);
+            FillProportions();
         }
     }
 
@@ -413,7 +419,7 @@ public class AnimationGenerator : MonoBehaviour
         if (modelMap.ContainsKey(n.name))
         {
             Transform t = modelMap[n.name];
-            SetNodePose(n, t, true);
+            SetNodePose(n, t);
             foreach (Node child in n.children)
             {
                 SetModel(child);
@@ -421,23 +427,90 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
-    public void SetNodePose(Node n, Transform t, Boolean check)
+    public void SetNodePose(Node n, Transform t)
     {
-        Vector3 position = new Vector3();
-        position.x = (float)n.position.x;
-        position.y = (float)n.position.y;
-        position.z = (float)n.position.z;
-        t.position = position;
-        if (n.eularAngles != null)
+        // float boneLength = spineProportions[t]
+        float time = (currentFrame * perFrameDistance) / splineLength;
+        if (spineProportions.ContainsKey(t))
         {
-            //The backend is not really returning the Euler angles, but instad a position that we must look at.
-            Vector3 eulerAngles = new Vector3(
-                                 (float)n.eularAngles.x,
-                                 (float)n.eularAngles.y,
-                                 (float)n.eularAngles.z
-                             );
-            t.LookAt(eulerAngles + position, upVector);
+            time += spineProportions[t];
         }
+        if (time < 1)
+        {
+            Vector3 position = spline.GetPoint(time);
+            t.position = position;
+            t.LookAt(spline.GetVelocity(time) + position, upVector);
+        }
+    }
+
+    BezierSpline spline;
+    public List<Vector3> GenerateSpline()
+    {
+        //The amount of points - 1 needs to be divisible by 3
+        spline = new BezierSpline();
+        spline.transform = transform;
+        if ((points.Count - 1) % 3 != 0)
+        {
+            int remainder = (points.Count - 1) % 3;
+            points.RemoveRange(points.Count - remainder, remainder);
+        }
+        spline.points = points.ToArray();
+        spline.ComputeControlPoints();
+        List<Vector3> computedPoints = new List<Vector3>();
+        for (float t = 0f; t < 1; t += 1.0f / points.Count)
+        {
+            computedPoints.Add(spline.GetPoint(t));
+        }
+        return computedPoints;
+    }
+
+
+    public void FillProportions()
+    {
+        splineLength = GetSplineLength();
+        spineProportions.Clear();
+        perFrameDistance = framesOfAnimation / splineLength;
+        Transform spine1 = AnimationData.FindChild("spine1", model);
+        Transform t = spine1;
+        for (int x = 2; t != null; x++)
+        {
+            Transform t2 = AnimationData.FindChild("spine" + x, model);
+            if (t2 != null)
+            {
+                spineProportions.Add(t, (Vector3.Distance(t.position, t2.position) / splineLength));
+            }
+            t = t2;
+        }
+        t = spine1;
+        for (int x = 2; t != null; x++)
+        {           
+            float newProportion = spineProportions.ContainsKey(t) ? spineProportions[t] : 0;
+            foreach (Transform trans in spineProportions.Keys)
+            {
+                if(t != trans && int.Parse(trans.name.Replace("spine", "")) > x - 1)
+                {
+                    newProportion += spineProportions[trans];
+                }
+            }
+            spineProportions.Remove(t);
+            spineProportions.Add(t, newProportion);
+            t = AnimationData.FindChild("spine" + x, model);
+        }
+    }
+
+    public float GetSplineLength()
+    {
+        float length = 0;
+        for(int x = 0; x < points.Count - 1; x++)
+        {
+            length += Vector3.Distance(points[x], points[x + 1]);
+        }
+        return length;
+    }
+
+    public bool CheckDistances()
+    {
+        return true;
     }
 
     public void RestoreAnimation()
@@ -455,7 +528,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public void AnimateFrame()
     {
-        if (currentFrame < frames.Length)
+        if (currentFrame < framesOfAnimation)
         {
             Node n = frames[currentFrame];
             if (n.rotation != null)
@@ -467,7 +540,7 @@ public class AnimationGenerator : MonoBehaviour
                 upVector = -planeVector1;
             }
           
-            SetNodePose(n, model, false);
+            SetNodePose(n, model);
             SetModel(frames[currentFrame]);
         }
     }
@@ -479,7 +552,7 @@ public class AnimationGenerator : MonoBehaviour
 
     public int GetNumFrames()
     {
-        return frames == null ? 0 : frames.Length;
+        return frames == null ? 0 : framesOfAnimation;
     }
 
     public void EditStart(Vector3 point)
