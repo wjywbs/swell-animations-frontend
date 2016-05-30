@@ -170,6 +170,7 @@ public class AnimationGeneratorEditor : Editor
             //generator.StopAnimation();
             generator.ClearPoints();
             generator.ClearRotationPoints();
+            generator.ClearDetailPoints();
             SceneView.RepaintAll();
             EditorUtility.SetDirty(generator);
         }
@@ -268,8 +269,8 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Rotation Point Range");
-        generator.rotationPointRange = (int)CustomGUILayout.FloatField((float)generator.rotationPointRange);
+        GUILayout.Label("Rotation Point and Animation Layer Range");
+        generator.mutatorStrength = (int)CustomGUILayout.FloatField((float)generator.mutatorStrength);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();

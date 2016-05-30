@@ -12,7 +12,7 @@ public class AnimationGenerator : MonoBehaviour
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
 
-    public int rotationPointRange = 25;
+    public int mutatorStrength = 25;
 
     public int widthLines = 10000;
     public int heightLines = 10000;
@@ -288,7 +288,7 @@ public class AnimationGenerator : MonoBehaviour
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
         rotationPoint.index = index;
-        rotationPoint.range = rotationPointRange;
+        rotationPoint.range = mutatorStrength;
         rotationPoints.Add(rotationPoint);
         points.Insert(index, closestPoint);
         addingRotationPoint = false;
@@ -394,7 +394,7 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints, detailLoaPoints);
+            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints, detailLoaPoints, mutatorStrength);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();

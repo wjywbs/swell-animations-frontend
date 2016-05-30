@@ -107,7 +107,7 @@ public class AnimationData
         return parent;
     }
 
-    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints, List<List<Vector3>> detailLoaPoints)
+    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints, List<List<Vector3>> detailLoaPoints, int strength)
     {
         ModelData modelData = new ModelData();
         modelData.model = GenerateNode(model);
@@ -127,10 +127,10 @@ public class AnimationData
 			int index;
 			FindClosestIntersect.Search (controlPoints, layer [layer.Count / 2], out index);
 			AnimationLayer animationLayer = new AnimationLayer()
-			{
-				numFrames = 10,
-				startFrame = index
-			};
+            {
+                startFrame = Math.Min(strength, index + 1),
+                numFrames = Math.Max(index - strength, 0)
+            };
             foreach(Vector3 point in layer)
             {
 				animationLayer.layerPoints.Add(new Vector()
@@ -155,8 +155,8 @@ public class AnimationData
                         z = rotPoint.rotation.eulerAngles.z
                     }
                 };
-                nrp.numFrames = Math.Min(rotPoint.range, rotPoint.index + 1);
-                nrp.startFrame = Math.Max(rotPoint.index - rotPoint.range, 0);
+                nrp.numFrames = Math.Min(strength, rotPoint.index + 1);
+                nrp.startFrame = Math.Max(rotPoint.index - strength, 0);
                 modelData.rotationpoints.Add(nrp);
             }
         }
