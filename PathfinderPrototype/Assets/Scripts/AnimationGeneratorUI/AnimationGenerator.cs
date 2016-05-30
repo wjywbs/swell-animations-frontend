@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using swellanimations;
 using System;
 using UnityEditor;
@@ -11,8 +12,10 @@ public class AnimationGenerator : MonoBehaviour
 {
     public const float SELECT_RANGE = 3.0f;
     public const float ROTATION_POINT_RADIUS = 1;
+    public const string FILE_LINE_SEPARATOR = "swellanimationsisthebesteverlonglivebun";
 
     public int mutatorStrength = 25;
+    public bool forceRestore = false;
 
     public int widthLines = 10000;
     public int heightLines = 10000;
@@ -82,7 +85,7 @@ public class AnimationGenerator : MonoBehaviour
     public bool renderLOA = true;
 
     [SerializeField]
-    private string serializedAnimation;
+    public string serializedAnimation;
 
     public int selectedRotationPointIndex = 0;
 
@@ -439,17 +442,15 @@ public class AnimationGenerator : MonoBehaviour
 
     public void RestoreAnimation()
     {
-        if (points != null)
+        if (forceRestore || (frames == null && serializedAnimation != null && !drawingLOA && points != null && points.Count > 0))
         {
-            if (frames == null && serializedAnimation != null && !drawingLOA && points.Count > 0)
-            {
-                ClearMaps();
-                FillModelMap(model);
-                Debug.Log("Restored using: " + serializedAnimation);
-                frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
-                Debug.Log("Restored: " + frames);
-            }
+            ClearMaps();
+            FillModelMap(model);
+            Debug.Log("Restored using: " + serializedAnimation);
+            frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
+            Debug.Log("Restored: " + frames);
         }
+
     }
 
     public void AnimateFrame()
@@ -550,5 +551,18 @@ public class AnimationGenerator : MonoBehaviour
             }
         }
         return closetRotPoint;
+    }
+
+    public void Export()
+    {
+        var fileName = EditorUtility.SaveFilePanelInProject("Export animation to file",
+            model.name + "_animation.txt",
+            "txt",
+            "Please enter a file name to save the animation to");
+        var sr = File.CreateText(fileName);
+        sr.Write(serializedAnimation);
+        sr.Write(FILE_LINE_SEPARATOR);
+        sr.Write(planeVector1.x + "," + planeVector1.y + "," + planeVector1.z);
+        sr.Close();
     }
 }

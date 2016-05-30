@@ -18,6 +18,7 @@ public class AnimationGeneratorEditor : Editor
     Texture2D clearIcon;
     Texture2D deleteIcon;
     Texture2D eyeIcon;
+    Texture2D exportIcon;
 
     bool blockingMouseInputForDrawing = false;
     private Vector2 lastPoint;
@@ -40,6 +41,7 @@ public class AnimationGeneratorEditor : Editor
         clearIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/clear-rotation.png", typeof(Texture2D));
         deleteIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/delete-rotation.png", typeof(Texture2D));
         eyeIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/eye_open.png", typeof(Texture2D));
+        exportIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Editor/Images/export-icon.png", typeof(Texture2D));
     }
 
     public override void OnInspectorGUI()
@@ -95,6 +97,10 @@ public class AnimationGeneratorEditor : Editor
         GUIContent hideDrawingPlaneButtonContent = new GUIContent();
         hideDrawingPlaneButtonContent.image = eyeIcon;
         hideDrawingPlaneButtonContent.text = "Toggle Drawing Plane";
+
+        GUIContent exportAnimationButtonContent = new GUIContent();
+        exportAnimationButtonContent.image = exportIcon;
+        exportAnimationButtonContent.text = "Export to file";
 
         GUILayout.BeginVertical();
         GUILayout.Label(" Animation Preview Control ");
@@ -256,6 +262,16 @@ public class AnimationGeneratorEditor : Editor
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button(exportAnimationButtonContent, middleButtonStyle))
+        {
+            generator.Export();
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
 
 
         GUILayout.BeginHorizontal();
