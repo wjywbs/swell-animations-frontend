@@ -461,6 +461,11 @@ public class AnimationGenerator : MonoBehaviour
             {
                 upVector = Quaternion.Euler(new Vector3((float)n.rotation.x, (float)n.rotation.y, (float)n.rotation.z)) * upVector;
             } 
+            else if (currentFrame == 0)
+            {
+                upVector = -planeVector1;
+            }
+          
             SetNodePose(n, model, false);
             SetModel(frames[currentFrame]);
         }
