@@ -137,10 +137,10 @@ public class AnimationGenerator : MonoBehaviour
         while (frame.children.Count > 0)
         {
             Vector3 tangent = new Vector3(
-                                     (float)frame.eularAngles.x,
-                                     (float)frame.eularAngles.y,
-                                     (float)frame.eularAngles.z
-                                 );
+                                  (float)frame.eularAngles.x,
+                                  (float)frame.eularAngles.y,
+                                  (float)frame.eularAngles.z
+                              );
 
             Vector3 position = new Vector3()
             {
@@ -432,10 +432,10 @@ public class AnimationGenerator : MonoBehaviour
         {
             //The backend is not really returning the Euler angles, but instad a position that we must look at.
             Vector3 eulerAngles = new Vector3(
-                                 (float)n.eularAngles.x,
-                                 (float)n.eularAngles.y,
-                                 (float)n.eularAngles.z
-                             );
+                                      (float)n.eularAngles.x,
+                                      (float)n.eularAngles.y,
+                                      (float)n.eularAngles.z
+                                  );
             t.LookAt(eulerAngles + position, upVector);
         }
     }
@@ -446,9 +446,8 @@ public class AnimationGenerator : MonoBehaviour
         {
             ClearMaps();
             FillModelMap(model);
-            Debug.Log("Restored using: " + serializedAnimation);
             frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
-            Debug.Log("Restored: " + frames);
+            Debug.Log("Restored: " + frames.Length);
         }
 
     }
@@ -461,7 +460,7 @@ public class AnimationGenerator : MonoBehaviour
             if (n.rotation != null)
             {
                 upVector = Quaternion.Euler(new Vector3((float)n.rotation.x, (float)n.rotation.y, (float)n.rotation.z)) * upVector;
-            } 
+            }
             else if (currentFrame == 0)
             {
                 upVector = -planeVector1;
@@ -556,9 +555,9 @@ public class AnimationGenerator : MonoBehaviour
     public void Export()
     {
         var fileName = EditorUtility.SaveFilePanelInProject("Export animation to file",
-            model.name + "_animation.txt",
-            "txt",
-            "Please enter a file name to save the animation to");
+                           model.name + "_animation.txt",
+                           "txt",
+                           "Please enter a file name to save the animation to");
         var sr = File.CreateText(fileName);
         sr.Write(serializedAnimation);
         sr.Write(FILE_LINE_SEPARATOR);

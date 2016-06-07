@@ -3,9 +3,10 @@ using System.Collections;
 using System.Globalization;
 using System.Collections.Generic;
 
-public static class CustomGUILayout {
-#if !UNITY_EDITOR
-private static int activeFloatField = -1;
+public static class CustomGUILayout
+{
+    #if !UNITY_EDITOR
+    private static int activeFloatField = -1;
 private static float activeFloatFieldLastValue = 0;
 private static string activeFloatFieldString = "";
 #endif

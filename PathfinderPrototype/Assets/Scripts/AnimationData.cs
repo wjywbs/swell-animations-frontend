@@ -21,7 +21,7 @@ public class AnimationData
     //The following are used for debug purposes
     public static void PrintAllNodes(Node node, string spacing)
     {
-        Debug.Log(spacing + NodeToString(node)); ;
+        Debug.Log(spacing + NodeToString(node));
         foreach (Node childNode in node.children)
         {
             PrintAllNodes(childNode, spacing + "-");
@@ -43,7 +43,8 @@ public class AnimationData
     //The following are used for debug purposes
     public static void PrintAllTransforms(Transform node, string spacing)
     {
-        Debug.Log(spacing + TransformToString(node)); ;
+        Debug.Log(spacing + TransformToString(node));
+        ;
         foreach (Transform childNode in node)
         {
             PrintAllTransforms(childNode, spacing + "-");
@@ -94,7 +95,7 @@ public class AnimationData
     public static Node GenerateChildren(Transform model, Node parent, int x)
     {
         Transform nextSpine = FindChild("spine" + x, model);
-        if(nextSpine != null)
+        if (nextSpine != null)
         {
             Node child = CreateNodeFromGameObject(nextSpine);
             if (x > 1)
@@ -112,35 +113,35 @@ public class AnimationData
         ModelData modelData = new ModelData();
         modelData.model = GenerateNode(model);
         //PrintAllNodes(modelData.model, "-");
-        foreach(Vector3 point in controlPoints)
+        foreach (Vector3 point in controlPoints)
         {
             modelData.controlPoints.Add(new Vector()
-            {
-                x = point.x,
-                y = point.y,
-                z = point.z
-            });
-        }
-        foreach(List<Vector3> layer in detailLoaPoints)
-        {
-			// Find closest index
-			int index;
-			FindClosestIntersect.Search (controlPoints, layer [layer.Count / 2], out index);
-			AnimationLayer animationLayer = new AnimationLayer()
-            {
-                startFrame = Math.Min(strength, index + 1),
-                numFrames = Math.Max(index - strength, 0)
-            };
-            foreach(Vector3 point in layer)
-            {
-				animationLayer.layerPoints.Add(new Vector()
                 {
                     x = point.x,
                     y = point.y,
                     z = point.z
                 });
+        }
+        foreach (List<Vector3> layer in detailLoaPoints)
+        {
+            // Find closest index
+            int index;
+            FindClosestIntersect.Search(controlPoints, layer[layer.Count / 2], out index);
+            AnimationLayer animationLayer = new AnimationLayer()
+            {
+                startFrame = Math.Min(strength, index + 1),
+                numFrames = Math.Max(index - strength, 0)
+            };
+            foreach (Vector3 point in layer)
+            {
+                animationLayer.layerPoints.Add(new Vector()
+                    {
+                        x = point.x,
+                        y = point.y,
+                        z = point.z
+                    });
             }
-			modelData.animationLayers.Add (animationLayer);
+            modelData.animationLayers.Add(animationLayer);
         }
         if (rotationPoints != null)
         {

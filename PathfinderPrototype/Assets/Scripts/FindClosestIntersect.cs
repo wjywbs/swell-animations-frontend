@@ -14,10 +14,10 @@ public class FindClosestIntersect
     {
         int closestIndex = 0;
         float closestDistance = Vector3.Distance(curve[0], point);
-        for(int x = 1; x < curve.Count; x++)
+        for (int x = 1; x < curve.Count; x++)
         {
             float distance = Vector3.Distance(curve[x], point);
-            if(distance < closestDistance)
+            if (distance < closestDistance)
             {
                 closestDistance = distance;
                 closestIndex = x;

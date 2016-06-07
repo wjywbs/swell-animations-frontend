@@ -2,17 +2,19 @@
 using System.Collections;
 
 [AddComponentMenu("Animation/Animation Tester")]
-public class TestScript : MonoBehaviour {
-
+public class TestScript : MonoBehaviour
+{
     public float delay = 0f;
     private bool started = false;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
     }
 	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update()
+    {
         if (Time.fixedTime > delay && !started)
         {
             started = true;

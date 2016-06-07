@@ -369,19 +369,19 @@ public class AnimationGeneratorEditor : Editor
                 {
                     Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                     generator.EditEnd(point);
-                }                     
+                }
                 else if (generator.detailingLOA)
                 {
                     generator.currentDetailLOA += 1;
                 }
-               EditorUtility.SetDirty(generator);
+                EditorUtility.SetDirty(generator);
                 generator.GenerateAnimation();
             }
             blockingMouseInputForDrawing = false;
-            if(generator.deletingRotationPoint)
+            if (generator.deletingRotationPoint)
             {
                 Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
-                if(generator.rotationPointToDelete == generator.getClosetestRotationPoint(point))
+                if (generator.rotationPointToDelete == generator.getClosetestRotationPoint(point))
                 {
                     Undo.RecordObject(generator, "Rotate Rotation Point");
                     generator.rotationPoints.Remove(generator.rotationPointToDelete);
@@ -397,7 +397,7 @@ public class AnimationGeneratorEditor : Editor
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(GetHashCode(), FocusType.Passive));
         }
         RotationPointHandles();
-    }    
+    }
 
     public void RotationPointHandles()
     {

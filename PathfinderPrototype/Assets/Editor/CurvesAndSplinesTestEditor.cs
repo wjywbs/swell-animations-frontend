@@ -2,8 +2,9 @@
 using UnityEditor;
 using System.Collections;
 
-[CustomEditor (typeof(CurvesAndSplinesTest))]
-public class CurvesAndSplinesTestEditor : Editor {
+[CustomEditor(typeof(CurvesAndSplinesTest))]
+public class CurvesAndSplinesTestEditor : Editor
+{
 
     private void OnSceneGUI()
     {

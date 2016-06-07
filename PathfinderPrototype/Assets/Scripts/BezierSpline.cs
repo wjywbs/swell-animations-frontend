@@ -64,7 +64,7 @@ public class BezierSpline
             i *= 3;
         }
         return transform.TransformPoint(Bezier.GetFirstDerivative(
-            controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], controlPoints[i + 3], t)) - transform.position;
+                controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], controlPoints[i + 3], t)) - transform.position;
     }
 
     public Vector3 GetDirection(float t)
@@ -90,7 +90,7 @@ public class BezierSpline
         //There are 10 points in each curve
         controlPoints = new Vector3[ControlPointNum];
         controlPoints[0] = points[0];
-        for (int i = 0; i < CurveCount / 3; i ++)
+        for (int i = 0; i < CurveCount / 3; i++)
         {
             float[] xPoints = new float[4];
             float[] yPoints = new float[4];
@@ -123,10 +123,11 @@ public class BezierSpline
             }
         }
         //Debug.Log("ComputeControlPoints():: Control points count: " + controlPoints.Length + " Curve count: " + CurveCount);
-            controlPointsComputed = true;
+        controlPointsComputed = true;
     }
 
-    private struct ComputedAxis{
+    private struct ComputedAxis
+    {
         public float[] point1;
         public float[] point2;
     };
@@ -192,7 +193,8 @@ public class BezierSpline
 
     public void Reset()
     {
-        points = new Vector3[] {
+        points = new Vector3[]
+        {
             new Vector3(1f, 0f, 0f),
             new Vector3(2f, 0f, 0f),
             new Vector3(3f, 0f, 0f),
