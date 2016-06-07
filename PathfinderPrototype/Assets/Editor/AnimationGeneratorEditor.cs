@@ -350,7 +350,6 @@ public class AnimationGeneratorEditor : Editor
                 else if (generator.detailingLOA)
                 {
                     generator.AddDetailPoint(point);
-                    Debug.Log("Adding a point to the line.!");
                 }
                 else
                 {

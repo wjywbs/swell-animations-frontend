@@ -112,14 +112,32 @@ public class AnimationData
         ModelData modelData = new ModelData();
         modelData.model = GenerateNode(model);
         //PrintAllNodes(modelData.model, "-");
-        foreach (Vector3 point in controlPoints)
+
+        if (controlPoints.Count > 0)
         {
-            modelData.controlPoints.Add(new Vector()
+            // TODO: Implement this in c++ side.
+            // TODO: Restore original speed after calculation.
+            Vector3 previous = controlPoints[0];
+            foreach (Vector3 point in controlPoints)
+            {
+                float distance = Vector3.Distance(previous, point);
+                // Add interpolate points for every step distance.
+                float step = 0.3f;
+                int extraPoints = (int)(distance / step);
+                for (int i = 1; i <= extraPoints; i++)
                 {
-                    x = point.x,
-                    y = point.y,
-                    z = point.z
-                });
+                    Vector3 extra = Vector3.Lerp(
+                        previous, point, i / (float)extraPoints);
+                    modelData.controlPoints.Add(new Vector()
+                        { x = extra.x, y = extra.y, z = extra.z });
+                }
+                //Debug.Log(distance + " " + extraPoints);
+                previous = point;
+
+                // Add the current point.
+                modelData.controlPoints.Add(new Vector()
+                    { x = point.x, y = point.y, z = point.z });
+            }
         }
         foreach (List<Vector3> layer in detailLoaPoints)
         {
