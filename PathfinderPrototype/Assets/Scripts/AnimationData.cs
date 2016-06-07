@@ -44,7 +44,6 @@ public class AnimationData
     public static void PrintAllTransforms(Transform node, string spacing)
     {
         Debug.Log(spacing + TransformToString(node));
-        ;
         foreach (Transform childNode in node)
         {
             PrintAllTransforms(childNode, spacing + "-");

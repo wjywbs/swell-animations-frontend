@@ -447,7 +447,7 @@ public class AnimationGenerator : MonoBehaviour
             ClearMaps();
             FillModelMap(model);
             frames = BackendAdapter.deserializeNodeArray(serializedAnimation);
-            Debug.Log("Restored: " + frames.Length);
+            Debug.Log("Restored: " + frames.Length + " frames");
         }
 
     }
