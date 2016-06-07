@@ -31,9 +31,6 @@ public class AnimationGenerator : MonoBehaviour
 
     public RotationPoint rotationPointToDelete;
 
-
-    private Quaternion handleRotation = Quaternion.identity;
-
     private int editStartIndex = 0;
     private int editEndIndex = 0;
     private List<Vector3> editPoints = new List<Vector3>();
@@ -287,6 +284,9 @@ public class AnimationGenerator : MonoBehaviour
             rotationPoints = new List<RotationPoint>();
         }
         Vector3 closestPoint = FindClosestIntersect.Search(points, mouseLocation, out index);
+        // The new point should at the middle of the 2 points.
+        index++;
+
         RotationPoint rotationPoint = new RotationPoint();
         rotationPoint.position = closestPoint;
         rotationPoint.rotation = Quaternion.identity;
@@ -402,7 +402,7 @@ public class AnimationGenerator : MonoBehaviour
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
-            //Debug.Log("Just serialized: " + serializedAnimation);
+            //Debug.Log("Animation generated");
             ClearMaps();
             FillModelMap(model);
         }

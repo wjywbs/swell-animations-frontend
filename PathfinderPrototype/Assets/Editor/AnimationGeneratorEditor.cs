@@ -379,6 +379,7 @@ public class AnimationGeneratorEditor : Editor
             blockingMouseInputForDrawing = false;
             if (generator.deletingRotationPoint)
             {
+                generator.deletingRotationPoint = false;
                 Vector3 point = getWorldPointFromMousePoint(e.mousePosition);
                 if (generator.rotationPointToDelete == generator.getClosetestRotationPoint(point))
                 {
