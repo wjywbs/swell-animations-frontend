@@ -88,6 +88,8 @@ public class AnimationGenerator : MonoBehaviour
 
     public Vector3 mouseLocation = new Vector3();
 
+    public bool dirty = false;
+
     void OnDrawGizmos()
     {
         DrawGrid();

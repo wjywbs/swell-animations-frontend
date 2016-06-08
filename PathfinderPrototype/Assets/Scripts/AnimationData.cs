@@ -122,7 +122,7 @@ public class AnimationData
             {
                 float distance = Vector3.Distance(previous, point);
                 // Add interpolate points for every step distance.
-                float step = 0.3f;
+                float step = 0.01f;
                 int extraPoints = (int)(distance / step);
                 for (int i = 1; i <= extraPoints; i++)
                 {

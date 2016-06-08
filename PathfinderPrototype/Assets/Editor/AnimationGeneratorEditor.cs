@@ -390,6 +390,11 @@ public class AnimationGeneratorEditor : Editor
                     generator.GenerateAnimation();
                 }
             }
+            if (generator.dirty)
+            {
+                generator.dirty = false;
+                generator.GenerateAnimation();
+            }
         }
         if (e.type == EventType.Layout && blockingMouseInputForDrawing)
         {
@@ -424,7 +429,7 @@ public class AnimationGeneratorEditor : Editor
                     EditorUtility.SetDirty(generator);
                     rotPoint.rotation = rot;
                     generator.StopAnimation();
-                    generator.GenerateAnimation();
+                    generator.dirty = true;
                 }
             }
         }
