@@ -290,6 +290,17 @@ public class AnimationGeneratorEditor : Editor
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        bool previousSmoothCurve = generator.smoothCurve;
+        generator.smoothCurve = EditorGUILayout.Toggle("Smooth Curve", generator.smoothCurve);
+        if (previousSmoothCurve != generator.smoothCurve)
+        {
+            SceneView.RepaintAll();
+            generator.StopAnimation();
+            generator.GenerateAnimation();
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         generator.model = EditorGUILayout.ObjectField("Model", generator.model, typeof(Transform), true) as Transform;
         GUILayout.EndHorizontal();
 

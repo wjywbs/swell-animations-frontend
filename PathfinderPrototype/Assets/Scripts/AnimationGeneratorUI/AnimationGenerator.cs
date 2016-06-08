@@ -80,6 +80,7 @@ public class AnimationGenerator : MonoBehaviour
     private Quaternion beginRotation;
     public bool drawPlane = true;
     public bool renderLOA = true;
+    public bool smoothCurve = true;
 
     [SerializeField]
     public string serializedAnimation;
@@ -178,19 +179,59 @@ public class AnimationGenerator : MonoBehaviour
         }
     }
 
+    // Returns a position between 4 Vector3 with Catmull-Rom Spline algorithm
+    // http://www.iquilezles.org/www/articles/minispline/minispline.htm
+    // http://www.habrador.com/tutorials/catmull-rom-splines/
+    Vector3 GetCatmullRomPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3 a = 0.5f * (2f * p1);
+        Vector3 b = 0.5f * (p2 - p0);
+        Vector3 c = 0.5f * (2f * p0 - 5f * p1 + 4f * p2 - p3);
+        Vector3 d = 0.5f * (-p0 + 3f * p1 - 3f * p2 + p3);
+
+        Vector3 pos = a + (b * t) + (c * t * t) + (d * t * t * t);
+        return pos;
+    }
+
+    // Returns a list of points of the Catmull-Rom curve.
+    // The first and last point will be dropped by the algorithm.
+    List<Vector3> GetCatmullRomCurve(List<Vector3> line)
+    {
+        List<Vector3> curve = new List<Vector3>();
+        for (int x = 1; x < line.Count - 2; x++)
+        {
+            Vector3 p0 = line[x - 1], p1 = line[x];
+            Vector3 p2 = line[x + 1], p3 = line[x + 2];
+
+            float step = 0.2f / Vector3.Distance(p1, p2);
+            step = step > 0.1f ? 0.1f : step;
+
+            // t is always between 0 and 1 and determines the resolution of the spline.
+            // 0 is always at p1.
+            for (float t = 0; t < 1; t += step)
+            {
+                // Find the coordinates between the control points with a Catmull-Rom spline.
+                curve.Add(GetCatmullRomPoint(t, p0, p1, p2, p3));
+            }
+            // Add the last point.
+            curve.Add(p2);
+        }
+        return curve;
+    }
+
     void DrawLine(List<Vector3> line, Color color)
     {
-        if (line != null)
-        {
-            Gizmos.color = color;
-            if (line.Count > 1)
-            {
-                for (int x = 1; x < line.Count; x++)
-                {
-                    Gizmos.DrawLine(line[x - 1], line[x]);
-                }
+        if (line == null || line.Count <= 1)
+            return;
 
-            }
+        Gizmos.color = color;
+        if (smoothCurve && line.Count >= 4)
+        {
+            line = GetCatmullRomCurve(line);
+        }
+        for (int x = 1; x < line.Count; x++)
+        {
+            Gizmos.DrawLine(line[x - 1], line[x]);
         }
     }
 
@@ -399,7 +440,12 @@ public class AnimationGenerator : MonoBehaviour
             beginPostion = model.position;
             beginRotation = model.rotation;
             currentFrame = 0;
-            ModelData modelData = AnimationData.CreateModelData(model, points, rotationPoints, detailLoaPoints, mutatorStrength);
+            List<Vector3> line = points;
+            if (smoothCurve && points.Count >= 4)
+            {
+                line = GetCatmullRomCurve(line);
+            }
+            ModelData modelData = AnimationData.CreateModelData(model, line, rotationPoints, detailLoaPoints, mutatorStrength);
             modelData.numberOfFrames = framesOfAnimation;
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
@@ -556,10 +602,14 @@ public class AnimationGenerator : MonoBehaviour
 
     public void Export()
     {
-        var fileName = EditorUtility.SaveFilePanelInProject("Export animation to file",
+        string fileName = EditorUtility.SaveFilePanelInProject("Export animation to file",
                            model.name + "_animation.txt",
                            "txt",
                            "Please enter a file name to save the animation to");
+        if (fileName == string.Empty)
+        {
+            return;
+        }
         var sr = File.CreateText(fileName);
         sr.Write(serializedAnimation);
         sr.Write(FILE_LINE_SEPARATOR);
