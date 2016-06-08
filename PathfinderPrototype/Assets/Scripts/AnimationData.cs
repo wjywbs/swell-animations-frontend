@@ -107,11 +107,15 @@ public class AnimationData
         return parent;
     }
 
-    public static ModelData CreateModelData(Transform model, List<Vector3> controlPoints, List<RotationPoint> rotationPoints, List<List<Vector3>> detailLoaPoints, int strength)
+    public static ModelData CreateModelData(
+        Transform model, List<Vector3> controlPoints,List<RotationPoint> rotationPoints,
+        List<List<Vector3>> detailLoaPoints, int numberOfFrames, int strength)
     {
         ModelData modelData = new ModelData();
+        modelData.numberOfFrames = numberOfFrames;
         modelData.model = GenerateNode(model);
         //PrintAllNodes(modelData.model, "-");
+        List<Vector3> interpolatedPoints = new List<Vector3>();
 
         if (controlPoints.Count > 0)
         {
@@ -128,6 +132,7 @@ public class AnimationData
                 {
                     Vector3 extra = Vector3.Lerp(
                         previous, point, i / (float)extraPoints);
+                    interpolatedPoints.Add(extra);
                     modelData.controlPoints.Add(new Vector()
                         { x = extra.x, y = extra.y, z = extra.z });
                 }
@@ -135,6 +140,7 @@ public class AnimationData
                 previous = point;
 
                 // Add the current point.
+                interpolatedPoints.Add(point);
                 modelData.controlPoints.Add(new Vector()
                     { x = point.x, y = point.y, z = point.z });
             }
@@ -152,11 +158,7 @@ public class AnimationData
             foreach (Vector3 point in layer)
             {
                 animationLayer.layerPoints.Add(new Vector()
-                    {
-                        x = point.x,
-                        y = point.y,
-                        z = point.z
-                    });
+                    { x = point.x, y = point.y, z = point.z });
             }
             modelData.animationLayers.Add(animationLayer);
         }
@@ -173,8 +175,11 @@ public class AnimationData
                         z = rotPoint.rotation.eulerAngles.z
                     }
                 };
-                nrp.numFrames = Math.Min(strength, rotPoint.index + 1);
-                nrp.startFrame = Math.Max(rotPoint.index - strength, 0);
+                //Debug.Log(rotPoint.rotation.eulerAngles.ToString());
+                int pointIndex = interpolatedPoints.IndexOf(rotPoint.position);
+                int frameIndex = (int)(pointIndex / (float)interpolatedPoints.Count * numberOfFrames);
+                nrp.numFrames = Math.Min(strength, frameIndex + 1);
+                nrp.startFrame = Math.Max(frameIndex - strength, 0);
                 modelData.rotationpoints.Add(nrp);
             }
         }

@@ -28,8 +28,8 @@ public class BezierCurveInspector : Editor
         Handles.DrawLine(p0, p1);
         Handles.DrawLine(p2, p3);
 
-        Handles.color = Color.white;
-        Vector3 lineStart = curve.GetPoint(0f);
+        //Handles.color = Color.white;
+        //Vector3 lineStart = curve.GetPoint(0f);
         Handles.color = Color.green;
         ShowDirections();
         Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);

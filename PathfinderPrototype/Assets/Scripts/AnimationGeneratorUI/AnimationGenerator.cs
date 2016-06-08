@@ -74,10 +74,6 @@ public class AnimationGenerator : MonoBehaviour
     public bool animationPlaying = false;
     private float m_LastEditorUpdateTime;
 
-    [SerializeField]
-    private Vector3 beginPostion;
-    [SerializeField]
-    private Quaternion beginRotation;
     public bool drawPlane = true;
     public bool renderLOA = true;
     public bool smoothCurve = true;
@@ -437,16 +433,14 @@ public class AnimationGenerator : MonoBehaviour
     {
         if (points != null && points.Count > 0)
         {
-            beginPostion = model.position;
-            beginRotation = model.rotation;
             currentFrame = 0;
             List<Vector3> line = points;
             if (smoothCurve && points.Count >= 4)
             {
                 line = GetCatmullRomCurve(line);
             }
-            ModelData modelData = AnimationData.CreateModelData(model, line, rotationPoints, detailLoaPoints, mutatorStrength);
-            modelData.numberOfFrames = framesOfAnimation;
+            ModelData modelData = AnimationData.CreateModelData(model, line, rotationPoints,
+                                      detailLoaPoints, framesOfAnimation, mutatorStrength);
             swellanimations.Animation animation = BackendAdapter.GenerateFromBackend(modelData);
             frames = animation.frames.ToArray();
             serializedAnimation = BackendAdapter.serializeNodeArray(frames);
@@ -513,7 +507,7 @@ public class AnimationGenerator : MonoBehaviour
             {
                 upVector = -planeVector1;
             }
-          
+            
             SetNodePose(n, model, false);
             SetModel(frames[currentFrame]);
         }
@@ -603,9 +597,9 @@ public class AnimationGenerator : MonoBehaviour
     public void Export()
     {
         string fileName = EditorUtility.SaveFilePanelInProject("Export animation to file",
-                           model.name + "_animation.txt",
-                           "txt",
-                           "Please enter a file name to save the animation to");
+                              model.name + "_animation.txt",
+                              "txt",
+                              "Please enter a file name to save the animation to");
         if (fileName == string.Empty)
         {
             return;

@@ -239,6 +239,8 @@ public class AnimationGeneratorEditor : Editor
             generator.ClearRotationPoints();
             SceneView.RepaintAll();
             EditorUtility.SetDirty(generator);
+            generator.StopAnimation();
+            generator.GenerateAnimation();
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
